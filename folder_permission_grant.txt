@@ -1,0 +1,4 @@
+ls -l /home/nam11linux/repos/nam/postgres
+sudo chmod -R g+rw /home/nam11linux/repos/nam/postgres
+sudo chgrp -R $USER /home/nam11linux/repos/nam/postgres
+sudo chmod -R 770 /home/nam11linux/repos/nam/postgres

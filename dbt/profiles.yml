@@ -1,0 +1,12 @@
+kai_asia_banking_dbt_project:
+  outputs:
+    dev:
+      dbname: db_banking
+      host: db
+      pass: db_password_banking
+      port: 5432
+      schema: dev
+      threads: 4
+      type: postgres
+      user: db_user_banking
+  target: dev

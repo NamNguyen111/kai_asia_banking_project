@@ -1,0 +1,57 @@
+services:
+  db:
+    container_name: postgres-container-kaiasia-banking-project
+    image: postgres:14.17
+    ports:
+      - 5001:5432
+    environment:
+      POSTGRES_DB: db_banking
+      POSTGRES_USER: db_user_banking
+      POSTGRES_PASSWORD: db_password_banking
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/airflow_init.sql:/docker-entrypoint-initdb.d/airflow_init.sql
+      - ./banking_data:/banking_raw_data
+    networks:
+      - kaiasia-banking-project-network
+  af:
+    container_name: airflow_container-kaiasia-banking-project
+    image: apache/airflow:3.0.2
+    ports:
+      - 8001:8080
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow_kai_asia:airflow_kai_asia@db:5432/airflow_db_kai_asia
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./utils:/opt/airflow/utils
+      - ./requirements.txt:/requirements.txt
+    group_add:
+      - '1001'
+    depends_on:
+      - db
+    networks:
+      - kaiasia-banking-project-network
+    command: >
+      bash -c "pip install -r /requirements.txt && airflow db migrate && airflow standalone"
+
+  dbt:
+    container_name: dbt_container-kaiasia-banking-project
+    image: ghcr.io/dbt-labs/dbt-postgres:1.9.latest
+    volumes:
+      - ./dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project:/user/app
+      - ./dbt/:/root/.dbt
+    working_dir: /user/app
+    environment:
+      - DBT_PROFILES_DIR=/root/.dbt
+    depends_on:
+      - db
+    networks:
+      - kaiasia-banking-project-network
+    # command: init kai_asia_banking_dbt_project
+    # command: debug
+    command: run
+  
+networks:
+  kaiasia-banking-project-network:
+    driver: bridge
