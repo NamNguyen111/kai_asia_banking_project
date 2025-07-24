@@ -26,6 +26,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./utils:/opt/airflow/utils
       - ./requirements.txt:/requirements.txt
+      - ./dbt:/opt/airflow/dbt
     group_add:
       - '1001'
     depends_on:

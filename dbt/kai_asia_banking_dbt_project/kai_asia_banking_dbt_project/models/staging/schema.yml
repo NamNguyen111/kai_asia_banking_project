@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: stg_branches
+    config:
+      tags: ["staging"]
+      
+  - name: stg_customers
+    config:
+      tags: ["staging"]
+
+  - name: stg_accounts
+    config:
+      tags: ["staging"]
+
+  - name: stg_transactions
+    config:
+      tags: ["staging"]
+
+  - name: stg_transaction_entries
+    config:
+      tags: ["staging"]
