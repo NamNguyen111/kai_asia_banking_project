@@ -122,7 +122,7 @@ with DAG(
                 "DBT_ENV": "snapshots",       
                 "BATCH_DATE": "{{ ds }}",   # Airflow execution date
             },
-            airflow_vars_to_purge_dbt_ls_cache=["dbt_staging_refresh"],
+            airflow_vars_to_purge_dbt_ls_cache=["dbt_snapshot_refresh"],
 
         ),
         execution_config=execution_config,
