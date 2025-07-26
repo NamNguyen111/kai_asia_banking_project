@@ -15,8 +15,7 @@ WITH source_data as (
             balance,
             status,
             branch_id,
-            created_at,
-            updated_at
+            created_at
     FROM {{ source('raw', 'accounts') }}
 ),
 
@@ -30,14 +29,13 @@ cleaned AS (
             branch_id,
             DATE(created_at) as data_date,
             created_at,
-            updated_at,
             CURRENT_TIMESTAMP as etl_at,
-            'stg_accounts' as etl_source_model
+            'raw_accounts' as etl_source_model
 
     FROM source_data
 
     {% if is_incremental() %}
-        WHERE GREATEST(created_at, updated_at) > (SELECT MAX(GREATEST(created_at, updated_at)) FROM {{ this }})
+        WHERE created_at > (SELECT MAX(created_at) FROM {{ this }})
         AND account_id is NOT NULL
     {% else %}
         WHERE account_id is NOT NULL

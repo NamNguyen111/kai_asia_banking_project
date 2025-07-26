@@ -35,7 +35,7 @@ cleaned AS (
     
     -- Audit fields (theo yêu cầu anh hướng dẫn)
     CURRENT_TIMESTAMP AS etl_at,  -- thời điểm đẩy vào staging
-    'stg_branches' AS etl_source_model
+    'raw_branches' AS etl_source_model
     
   FROM source_data
   

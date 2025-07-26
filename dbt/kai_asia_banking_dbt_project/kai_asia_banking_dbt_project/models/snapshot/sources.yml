@@ -6,12 +6,12 @@
 version: 2
 
 sources:
-  - name: raw              # tên schema raw trong DB
-    schema: raw
+  - name: staging              # tên schema raw trong DB
+    schema: staging
     database: db_banking
     tables:
-      - name: branches     # tên bảng trong schema raw
-      - name: customers     
-      - name: transactions   
-      - name: accounts      
-      - name: transaction_entries    
+      - name: stg_branches     # tên bảng trong schema raw
+      - name: stg_customers     
+      - name: stg_transactions   
+      - name: stg_accounts      
+      - name: stg_transaction_entries    

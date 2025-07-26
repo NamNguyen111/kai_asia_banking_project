@@ -17,16 +17,22 @@ services:
   af:
     container_name: airflow_container-kaiasia-banking-project
     image: apache/airflow:3.0.2
+    # Thêm user mapping để fix permission
+    user: "50000:0"  # Airflow user ID
     ports:
       - 8001:8080
     environment:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow_kai_asia:airflow_kai_asia@db:5432/airflow_db_kai_asia
+      # Thêm biến môi trường để fix permission
+      AIRFLOW_UID: 50000
+      AIRFLOW_GID: 0
+      AIRFLOW__CORE__FERNET_KEY: "o4PNNr_ZJScsfFO4WPsmsmTBmHC6SDouIOkwfl_4a_E="
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - /var/run/docker.sock:/var/run/docker.sock
       - ./utils:/opt/airflow/utils
       - ./requirements.txt:/requirements.txt
-      - ./dbt:/opt/airflow/dbt
+      - ./dbt:/opt/airflow/dbt:rw  # Thêm rw (read-write) permission
     group_add:
       - '1001'
     depends_on:

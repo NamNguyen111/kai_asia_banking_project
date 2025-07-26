@@ -32,7 +32,7 @@ cleaned AS (
             DATE(created_at) as data_date,
             created_at,
             CURRENT_TIMESTAMP as etl_at,
-            'stg_transactions' as etl_source_model
+            'raw_transactions' as etl_source_model
 
     FROM source_data
 

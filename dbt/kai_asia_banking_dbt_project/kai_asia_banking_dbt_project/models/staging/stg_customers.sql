@@ -16,9 +16,7 @@ WITH source_data as (
         id_number,
         address,
         date_of_birth,
-        status,
-        created_at,
-        updated_at
+        created_at
     FROM {{ source('raw','customers') }}
 ),
 
@@ -32,14 +30,12 @@ cleaned AS (
         TRIM(id_number) as identity_number,
         TRIM(address) as address,
         date_of_birth as date_of_birth,
-        UPPER(TRIM(status)) as status,
         DATE(created_at) as data_date,
 
         created_at,
-        updated_at,
 
         CURRENT_TIMESTAMP as etl_at,
-        'stg_customers' as etl_source_model
+        'raw_customers' as etl_source_model
     
     FROM source_data
 

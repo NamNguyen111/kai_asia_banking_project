@@ -2,3 +2,17 @@ ls -l /home/nam11linux/repos/nam/postgres
 sudo chmod -R g+rw /home/nam11linux/repos/nam/postgres
 sudo chgrp -R $USER /home/nam11linux/repos/nam/postgres
 sudo chmod -R 770 /home/nam11linux/repos/nam/postgres
+
+docker exec -it postgres-container-kaiasia-banking-project psql -U airflow_kai_asia -d airflow_db_kai_asia
+
+-- Kiểm tra tất cả connections hiện tại
+SELECT conn_id, conn_type, host, schema, login FROM connection;
+
+-- Xóa tất cả connections (nếu muốn xóa hết)
+DELETE FROM connection;
+
+-- Hoặc xóa connection cụ thể (thay 'connection_name' bằng tên connection thực tế)
+DELETE FROM connection WHERE conn_id = 'connection_name';
+
+-- Kiểm tra lại sau khi xóa
+SELECT COUNT(*) FROM connection;
