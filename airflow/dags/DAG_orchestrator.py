@@ -118,18 +118,27 @@ with DAG(
         render_config = RenderConfig(
             select = ["path:snapshots"],
             enable_mock_profile = False,
-            env_vars={  # Biến môi trường nếu cần
+            env_vars={  
                 "DBT_ENV": "snapshots",       
-                "BATCH_DATE": "{{ ds }}",   # Airflow execution date
+                "BATCH_DATE": "{{ ds }}",
+                "DBT_PROFILES_DIR": "/opt/airflow/dbt/profiles",
+                "DBT_PROJECT_DIR": "/opt/airflow/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project",
+                "DBT_PARTIAL_PARSE": "false",
+                "DBT_STATIC_PARSER": "false",
             },
             airflow_vars_to_purge_dbt_ls_cache=["dbt_snapshot_refresh"],
-
         ),
-        execution_config=execution_config,
+        # execution_config=execution_config,
+        execution_config = ExecutionConfig(
+            invocation_mode=InvocationMode.SUBPROCESS,
+            dbt_executable_path="dbt",
+        ),
         profile_config=profile_config,
         operator_args={
             "install_deps": True,  # Tự động install dbt dependencies
             "full_refresh": False,  # Không full refresh mặc định
+            "debug": True,
+            "log_level": "debug",
             "vars": {
                 "execution_date": "{{ ds }}",
                 "dag_run_id": "{{ dag_run.run_id }}",
