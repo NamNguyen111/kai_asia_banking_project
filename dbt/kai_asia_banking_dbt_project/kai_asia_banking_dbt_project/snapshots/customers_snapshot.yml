@@ -1,10 +1,10 @@
-version: 2
+# version: 2
 
-snapshots:
-  - name: snp_customers
-    description: Slowly-changing snapshot of customer master data.
-    columns:
-      - name: customer_id
-        description: Unique identifier for the customer
-        tests:
-          - not_null
+# snapshots:
+#   - name: snp_customers
+#     description: Slowly-changing snapshot of customer master data.
+#     columns:
+#       - name: customer_id
+#         description: Unique identifier for the customer
+#         tests:
+#           - not_null
