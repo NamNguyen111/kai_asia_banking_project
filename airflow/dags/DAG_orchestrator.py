@@ -21,8 +21,7 @@ profile_config = ProfileConfig(
     target_name="dev",
     profile_mapping=PostgresUserPasswordProfileMapping(
         conn_id="postgres_kai_asia_banking_project",
-        profile_args={
-            "schema": "staging",
+        profile_args={  
             "dbname": "db_banking",
         },
     ),
@@ -126,7 +125,7 @@ with DAG(
                 "DBT_PARTIAL_PARSE": "false",
                 "DBT_STATIC_PARSER": "false",
             },
-            airflow_vars_to_purge_dbt_ls_cache=["dbt_snapshot_refresh"],
+            airflow_vars_to_purge_dbt_ls_cache=["dbt_snapshots_refresh"],
         ),
         # execution_config=execution_config,
         execution_config = ExecutionConfig(

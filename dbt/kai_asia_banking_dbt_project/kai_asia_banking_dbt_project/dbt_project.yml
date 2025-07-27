@@ -32,6 +32,3 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   kai_asia_banking_dbt_project:
     # Config indicated by + and applies to all files under models/example/
-    staging:
-      +schema: staging
-      +materialized: view
