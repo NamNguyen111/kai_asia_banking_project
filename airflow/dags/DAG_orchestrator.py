@@ -13,20 +13,33 @@ from cosmos.profiles import PostgresUserPasswordProfileMapping
 # Cấu hình đường dẫn dbt project
 # Trong container, dbt được mount tại /opt/airflow/dbt
 DEFAULT_DBT_ROOT_PATH = Path("/opt/airflow/dbt")
-DBT_ROOT_PATH = Path(os.getenv("DBT_ROOT_PATH", DEFAULT_DBT_ROOT_PATH))
+# DBT_ROOT_PATH = Path(os.getenv("DBT_ROOT_PATH", DEFAULT_DBT_ROOT_PATH))
 
 # Cấu hình profile cho PostgreSQL
-profile_config = ProfileConfig(
+# profile_config = ProfileConfig(
+#     profile_name="kai_asia_banking_dbt_project",
+#     target_name="dev",
+#     profile_mapping=PostgresUserPasswordProfileMapping(
+#         conn_id="postgres_kai_asia_banking_project",
+#         profile_args={  
+#             "schema": "staging",
+#             "dbname": "db_banking",
+#         },
+#     ),
+# )
+ 
+base_profile_config = ProfileConfig(
     profile_name="kai_asia_banking_dbt_project",
     target_name="dev",
     profile_mapping=PostgresUserPasswordProfileMapping(
         conn_id="postgres_kai_asia_banking_project",
-        profile_args={  
+        profile_args={
             "dbname": "db_banking",
+            "schema": "public", # Dummy schema để đỡ phải tạo nhiều profile
         },
     ),
 )
- 
+
 # Cấu hình thực thi
 execution_config = ExecutionConfig(
     invocation_mode=InvocationMode.SUBPROCESS,
@@ -34,7 +47,7 @@ execution_config = ExecutionConfig(
 
 # Default arguments cho DAG
 default_args = {
-    'owner': 'nam',
+    'owner': 'nam_11',
     'depends_on_past': False,
     'start_date': datetime(2024, 1, 1),
     'email_on_failure': False,
@@ -56,16 +69,9 @@ with DAG(
     
     # Task khởi đầu
     start_staging = EmptyOperator(
-        task_id="start_staging_pipeline",
-        doc_md="Start of the staging data pipeline"
+        task_id="start_point_of_the_pipeline",
+        doc_md="Start of the data pipeline"
     )
-
-
-
-
-
-
-
 
 
 
@@ -73,7 +79,7 @@ with DAG(
     staging_models = DbtTaskGroup(
         group_id="staging_models",
         project_config=ProjectConfig(
-            dbt_project_path=(DBT_ROOT_PATH / "kai_asia_banking_dbt_project" / "kai_asia_banking_dbt_project").as_posix(),
+            dbt_project_path=(DEFAULT_DBT_ROOT_PATH / "kai_asia_banking_dbt_project" / "kai_asia_banking_dbt_project").as_posix(),
             # Có thể thêm dbt_vars nếu cần
             # dbt_vars={"env": "staging", "batch_date": "{{ ds }}"}
         ),
@@ -86,18 +92,19 @@ with DAG(
                 "DBT_ENV": "staging",       
                 "BATCH_DATE": "{{ ds }}",   # Airflow execution date
             },
-            airflow_vars_to_purge_dbt_ls_cache=["dbt_staging_refresh"], # Cache configuration
+            # airflow_vars_to_purge_dbt_ls_cache=["dbt_staging_refresh"], # Cache configuration
         ),
         execution_config=execution_config,
-        profile_config=profile_config,
+        profile_config=base_profile_config,
         # Operator arguments
         operator_args={
+            "vars": {"custom_schema": "staging"},
             "install_deps": True,  # Tự động install dbt dependencies
             "full_refresh": False,  # Không full refresh mặc định
-            "vars": {
-                "execution_date": "{{ ds }}",
-                "dag_run_id": "{{ dag_run.run_id }}",
-            }
+            # "vars": {
+            #     "execution_date": "{{ ds }}",
+            #     "dag_run_id": "{{ dag_run.run_id }}",
+            # }
         },
         # Default args cho các tasks trong group
         default_args={
@@ -109,46 +116,46 @@ with DAG(
     
 
 
-    snapshot_models = DbtTaskGroup(
-        group_id = "snapshot_models",
-        project_config = ProjectConfig(
-            dbt_project_path = (DBT_ROOT_PATH / "kai_asia_banking_dbt_project" / "kai_asia_banking_dbt_project").as_posix(),
-        ),
-        render_config = RenderConfig(
-            select = ["path:snapshots"],
-            enable_mock_profile = False,
-            env_vars={  
-                "DBT_ENV": "snapshots",       
-                "BATCH_DATE": "{{ ds }}",
-                "DBT_PROFILES_DIR": "/opt/airflow/dbt/profiles",
-                "DBT_PROJECT_DIR": "/opt/airflow/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project",
-                "DBT_PARTIAL_PARSE": "false",
-                "DBT_STATIC_PARSER": "false",
-            },
-            airflow_vars_to_purge_dbt_ls_cache=["dbt_snapshots_refresh"],
-        ),
-        # execution_config=execution_config,
-        execution_config = ExecutionConfig(
-            invocation_mode=InvocationMode.SUBPROCESS,
-            dbt_executable_path="dbt",
-        ),
-        profile_config=profile_config,
-        operator_args={
-            "install_deps": True,  # Tự động install dbt dependencies
-            "full_refresh": False,  # Không full refresh mặc định
-            "debug": True,
-            "log_level": "debug",
-            "vars": {
-                "execution_date": "{{ ds }}",
-                "dag_run_id": "{{ dag_run.run_id }}",
-            }
-        },
-        default_args={
-            "retries": 1,
-            "retry_delay": timedelta(minutes=3),
-            "execution_timeout": timedelta(hours=2),  # Timeout sau 2 giờ
-        },
-    )
+    # snapshot_models = DbtTaskGroup(
+    #     group_id = "snapshot_models",
+    #     project_config = ProjectConfig(
+    #         dbt_project_path = (DBT_ROOT_PATH / "kai_asia_banking_dbt_project" / "kai_asia_banking_dbt_project").as_posix(),
+    #     ),
+    #     render_config = RenderConfig(
+    #         select = ["path:snapshots"],
+    #         enable_mock_profile = False,
+    #         env_vars={  
+    #             "DBT_ENV": "snapshots",       
+    #             "BATCH_DATE": "{{ ds }}",
+    #             "DBT_PROFILES_DIR": "/opt/airflow/dbt/profiles",
+    #             "DBT_PROJECT_DIR": "/opt/airflow/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project",
+    #             "DBT_PARTIAL_PARSE": "false",
+    #             "DBT_STATIC_PARSER": "false",
+    #         },
+    #         airflow_vars_to_purge_dbt_ls_cache=["dbt_snapshots_refresh"],
+    #     ),
+    #     # execution_config=execution_config,
+    #     execution_config = ExecutionConfig(
+    #         invocation_mode=InvocationMode.SUBPROCESS,
+    #         dbt_executable_path="dbt",
+    #     ),
+    #     profile_config=profile_config,
+    #     operator_args={
+    #         "install_deps": True,  # Tự động install dbt dependencies
+    #         "full_refresh": False,  # Không full refresh mặc định
+    #         "debug": True,
+    #         "log_level": "debug",
+    #         "vars": {
+    #             "execution_date": "{{ ds }}",
+    #             "dag_run_id": "{{ dag_run.run_id }}",
+    #         }
+    #     },
+    #     default_args={
+    #         "retries": 1,
+    #         "retry_delay": timedelta(minutes=3),
+    #         "execution_timeout": timedelta(hours=2),  # Timeout sau 2 giờ
+    #     },
+    # )
 
 
 
@@ -179,10 +186,10 @@ with DAG(
 
     # Task kết thúc
     end_staging = EmptyOperator(
-        task_id="end_staging_pipeline",
-        doc_md="End of the staging data pipeline"
+        task_id="end_point_of_the_pipeline",
+        doc_md="End of the data pipeline"
     )
-    start_staging >> staging_models >> snapshot_models >> end_staging
+    start_staging >> staging_models >> end_staging
 
 
 

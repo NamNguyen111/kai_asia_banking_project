@@ -1,9 +1,9 @@
 {{
   config(
     materialized='incremental',
-    schema='staging',
     unique_key='branch_id',
-    on_schema_change='fail'
+    on_schema_change='fail',
+    schema=var("custom_schema", "staging")
   )
 }}
 

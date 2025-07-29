@@ -2,7 +2,7 @@
 
 {{
     config(
-        target_schema='snapshots',
+        target_schema=var("custom_schema", "snapshots"),
         target_database='db_banking',
         unique_key='branch_id',
         strategy='check',

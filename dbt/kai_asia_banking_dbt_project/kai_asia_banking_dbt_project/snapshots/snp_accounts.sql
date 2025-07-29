@@ -1,7 +1,7 @@
 {% snapshot snp_accounts %}
 {{
     config(
-        target_schema='snapshots',
+        target_schema=var("custom_schema", "snapshots"),
         target_database='db_banking',
         unique_key='account_id',
         strategy='check',
