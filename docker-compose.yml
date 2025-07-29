@@ -48,6 +48,7 @@ services:
     volumes:
       - ./dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project:/user/app
       - ./dbt/:/root/.dbt
+      - ./dbt/profiles.yml:/opt/dbt/profiles/profiles.yml
     working_dir: /user/app
     environment:
       - DBT_PROFILES_DIR=/root/.dbt

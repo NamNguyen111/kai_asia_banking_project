@@ -66,9 +66,10 @@ with DAG(
             dbt_project_path = (DEFAULT_DBT_ROOT_PATH / "kai_asia_banking_dbt_project" / "kai_asia_banking_dbt_project").as_posix(),
         ),
         render_config = RenderConfig(
-            select=[
-                "resource_type:snapshot",
-            ],
+            # select=[
+            #     "resource_type:snapshot",
+            # ],
+            select=["snp_branches"],
             enable_mock_profile = False,
             env_vars={  
                 "DBT_ENV": "snapshots",       
