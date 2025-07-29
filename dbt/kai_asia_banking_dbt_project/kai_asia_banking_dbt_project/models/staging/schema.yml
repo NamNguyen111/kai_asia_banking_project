@@ -2,21 +2,77 @@ version: 2
 
 models:
   - name: stg_branches
-    config:
-      tags: ["staging"]
-      
-  - name: stg_customers
-    config:
-      tags: ["staging"]
+    description: "Staging data for branches"
+    columns:
+      - name: branch_id
+      - name: branch_name
+      - name: address
+      - name: status
+      - name: data_date
+      - name: created_at
+      - name: etl_at
+      - name: etl_source_model
 
+  - name: stg_customers
+    description: "Staging data for customers"
+    columns:
+      - name: customer_id
+      - name: full_name
+      - name: phone_number
+      - name: email_address
+      - name: identity_number
+      - name: address
+      - name: date_of_birth
+      - name: data_date
+      - name: created_at
+      - name: etl_at
+      - name: etl_source_model
+    
   - name: stg_accounts
-    config:
-      tags: ["staging"]
+    description: "Staging data for accounts"
+    columns:
+      - name: account_id
+      - name: customer_id
+      - name: account_number
+      - name: account_type
+      - name: balance
+      - name: status
+      - name: branch_id
+      - name: data_date
+      - name: created_at
+      - name: etl_at
+      - name: etl_source_model
 
   - name: stg_transactions
-    config:
-      tags: ["staging"]
+    description: "Staging data for transactions"
+    columns:
+      - name: transaction_id
+      - name: reference_number
+      - name: from_account_id
+      - name: to_account_id
+      - name: amount
+      - name: transaction_type
+      - name: transaction_channel
+      - name: transaction_description
+      - name: data_date
+      - name: created_at
+      - name: etl_at
+      - name: etl_source_model
 
   - name: stg_transaction_entries
-    config:
-      tags: ["staging"]
+    description: "Staging data for transaction entries"
+    columns:
+      - name: entry_id
+      - name: transaction_id
+      - name: account_id
+      - name: debit_amount
+      - name: credit_amount
+      - name: balance_before
+      - name: balance_after
+      - name: entry_type
+      - name: entry_sequence
+      - name: entry_description
+      - name: data_date
+      - name: created_at
+      - name: etl_at
+      - name: etl_source_model
