@@ -15,3 +15,10 @@ sources:
       - name: stg_transactions   
       - name: stg_accounts      
       - name: stg_transaction_entries    
+  - name: snapshots
+    schema: snapshots
+    database: db_banking
+    tables:
+      - name: snp_branches
+      - name: snp_customers
+      - name: snp_accounts
