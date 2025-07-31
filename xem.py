@@ -1,31 +1,25 @@
-[2025-07-27, 07:37:15] INFO - [0m00:37:15  1 of 1 OK snapshotted snapshots.snp_branches ................................... [[32mINSERT 0 1[0m in 0.23s]: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:15] INFO - [0m00:37:15: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:15] INFO - [0m00:37:15  Finished running 1 snapshot in 0 hours 0 minutes and 0.36 seconds (0.36s).: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:15] INFO - [0m00:37:15: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:15] INFO - [0m00:37:15  [32mCompleted successfully[0m: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:15] INFO - [0m00:37:15: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:15] INFO - [0m00:37:15  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=1: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:15] INFO - [0m00:37:15  [[33mWARNING[0m][DeprecationsSummary]: Deprecated functionality: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:15] INFO - Summary of encountered deprecations:: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:15] INFO - - ModelParamUsageDeprecation: 1 occurrence: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:15] INFO - To see all deprecation instances instead of just the first occurrence of each,: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:15] INFO - run command again with the `--show-all-deprecations` flag. You may also need to: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:15] INFO - run with `--no-partial-parse` as some deprecations are only encountered during: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:15] INFO - parsing.: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:17] INFO - Command exited with return code 0: source="airflow.task.hooks.cosmos.hooks.subprocess.FullOutputSubprocessHook"
-[2025-07-27, 07:37:17] INFO - parsing.: source="cosmos.operators.base"
-[2025-07-27, 07:37:17] WARNING - 
-                Airflow 3.0.0 Asset (Dataset) URIs validation rules changed and OpenLineage URIs (standard used by Cosmos) are no longer accepted.
-                Therefore, if using Cosmos with Airflow 3, the Airflow Asset (Dataset) URI is now <postgres://db:5432/db_banking/staging/stg_branches>.
-                Before, with Airflow 2.x, the URI used to be <postgres://db:5432/db_banking.staging.stg_branches>.
-                Please, change any DAGs that were scheduled using the old standard to the new one.
-                : source="cosmos.operators.local"
-[2025-07-27, 07:37:17] WARNING - 
-                Airflow 3.0.0 Asset (Dataset) URIs validation rules changed and OpenLineage URIs (standard used by Cosmos) are no longer accepted.
-                Therefore, if using Cosmos with Airflow 3, the Airflow Asset (Dataset) URI is now <postgres://db:5432/db_banking/snapshots/snp_branches>.
-                Before, with Airflow 2.x, the URI used to be <postgres://db:5432/db_banking.snapshots.snp_branches>.
-                Please, change any DAGs that were scheduled using the old standard to the new one.
-                : source="cosmos.operators.local"
-[2025-07-27, 07:37:17] INFO - Inlets: [Asset(name='postgres://db:5432/db_banking/staging/stg_branches', uri='postgres://db:5432/db_banking/staging/stg_branches', group='asset', extra={}, watchers=[])]: source="cosmos.operators.base"
-[2025-07-27, 07:37:17] INFO - Outlets: [Asset(name='postgres://db:5432/db_banking/snapshots/snp_branches', uri='postgres://db:5432/db_banking/snapshots/snp_branches', group='asset', extra={}, watchers=[])]: source="cosmos.operators.base"
-[2025-07-27, 07:37:17] INFO - Assigning outlets with DatasetAlias in Airflow 3: source="cosmos.operators.local"
+Log message source details: sources=["/opt/airflow/logs/dag_id=dbt_all_models_kai_asia_banking/run_id=manual__2025-07-29T22:52:47.119268+00:00/task_id=snapshot_models/attempt=1.log"]
+[2025-07-30, 05:53:01] INFO - DAG bundles loaded: dags-folder: source="airflow.dag_processing.bundles.manager.DagBundlesManager"
+[2025-07-30, 05:53:01] INFO - Filling up the DagBag from /opt/airflow/dags/DAG_orchestrator.py: source="airflow.models.dagbag.DagBag"
+[2025-07-30, 05:53:01] INFO - Trying to parse the dbt project using dbt ls cache cosmos_cache__dbt_all_models_kai_asia_banking__staging_models...: source="cosmos.dbt.graph"
+[2025-07-30, 05:53:01] INFO - Cosmos performance: time to calculate cache identifier cosmos_cache__dbt_all_models_kai_asia_banking__staging_models for current version: 0.013849853000010626: source="cosmos.cache"
+[2025-07-30, 05:53:01] INFO - Cosmos performance [f4522ff27486|425]: The cache size for cosmos_cache__dbt_all_models_kai_asia_banking__staging_models is 5316: source="cosmos.dbt.graph"
+[2025-07-30, 05:53:01] INFO - Cosmos performance: Cache hit for cosmos_cache__dbt_all_models_kai_asia_banking__staging_models - 7eacfa3937867b8c232bd1257bac382d,32c63dd9f4d194ebfd7bfa22ed41fcde: source="cosmos.dbt.graph"
+[2025-07-30, 05:53:01] INFO - Total nodes: 5: source="cosmos.dbt.graph"
+[2025-07-30, 05:53:01] INFO - Total filtered nodes: 5: source="cosmos.dbt.graph"
+[2025-07-30, 05:53:01] INFO - Cosmos performance (dbt_all_models_kai_asia_banking__staging_models) -  [f4522ff27486|425]: It took 0.0315s to parse the dbt project for DAG using LoadMode.DBT_LS_CACHE: source="cosmos.converter"
+[2025-07-30, 05:53:01] INFO - Project /opt/airflow/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project does not have {'dependencies.yml', 'packages.yml'}: source="cosmos.dbt.project"
+[2025-07-30, 05:53:01] INFO - Project /opt/airflow/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project does not have {'dependencies.yml', 'packages.yml'}: source="cosmos.dbt.project"
+[2025-07-30, 05:53:01] INFO - Project /opt/airflow/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project does not have {'dependencies.yml', 'packages.yml'}: source="cosmos.dbt.project"
+[2025-07-30, 05:53:01] INFO - Project /opt/airflow/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project does not have {'dependencies.yml', 'packages.yml'}: source="cosmos.dbt.project"
+[2025-07-30, 05:53:01] INFO - Project /opt/airflow/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project does not have {'dependencies.yml', 'packages.yml'}: source="cosmos.dbt.project"
+[2025-07-30, 05:53:01] INFO - Project /opt/airflow/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project does not have {'dependencies.yml', 'packages.yml'}: source="cosmos.dbt.project"
+[2025-07-30, 05:53:01] INFO - Cosmos performance (dbt_all_models_kai_asia_banking__staging_models) - [f4522ff27486|425]: It took 0.0037s to build the Airflow DAG.: source="cosmos.converter"
+[2025-07-30, 05:53:01] WARNING - Pydantic serializer warnings:
+  PydanticSerializationUnexpectedValue(Expected `str` - serialized value may not be as expected [input_value={'version': '7eacfa393786...p_id': 'staging_models'}, input_type=dict]): category="UserWarning": filename="/home/airflow/.local/lib/python3.12/site-packages/pydantic/main.py": lineno=463: source="py.warnings"
+[2025-07-30, 05:53:01] INFO - Starting docker container from image ghcr.io/dbt-labs/dbt-postgres:1.9.latest: source="airflow.task.operators.airflow.providers.docker.operators.docker.DockerOperator"
+[2025-07-30, 05:53:02] INFO - [0m22:53:02  Running with dbt=1.9.0: source="airflow.task.operators.airflow.providers.docker.operators.docker.DockerOperator"
+[2025-07-30, 05:53:03] INFO - [0m22:53:03  Registered adapter: postgres=1.9.0: source="airflow.task.operators.airflow.providers.docker.operators.docker.DockerOperator"
+[2025-07-30, 05:53:03] INFO - [0m22:53:03  Found 5 models, 3 snapshots, 13 sources, 430 macros: source="airflow.task.operators.airflow.providers.docker.operators.docker.DockerOperator"
+[2025-07-30, 05:53:03] INFO - [0m22:53:03  Nothing to do. Try checking your model configs and model specification args: source="airflow.task.operators.airflow.providers.docker.operators.docker.DockerOperator"
+[2025-07-30, 05:53:04] INFO - Pushing xcom: ti="RuntimeTaskInstance(id=UUID('01985863-6ab3-782d-ac80-00674ff28e00'), task_id='snapshot_models', dag_id='dbt_all_models_kai_asia_banking', run_id='manual__2025-07-29T22:52:47.119268+00:00', try_number=1, map_index=-1, hostname='f4522ff27486', context_carrier=None, task=<Task(DockerOperator): snapshot_models>, bundle_instance=LocalDagBundle(name=dags-folder), max_tries=2, start_date=datetime.datetime(2025, 7, 29, 22, 53, 1, 257078, tzinfo=TzInfo(UTC)), end_date=None, state=<TaskInstanceState.RUNNING: 'running'>, is_mapped=False, rendered_map_index=None)": source="task"

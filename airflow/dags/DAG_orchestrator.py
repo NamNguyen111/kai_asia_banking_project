@@ -2,6 +2,7 @@
 DAG to run all dbt models for Kai Asia Banking Project
 """
 import os
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from airflow import DAG
@@ -9,25 +10,15 @@ from airflow.operators.empty import EmptyOperator
 from cosmos import DbtTaskGroup, ExecutionConfig, ProfileConfig, ProjectConfig, RenderConfig
 from cosmos.constants import InvocationMode
 from cosmos.profiles import PostgresUserPasswordProfileMapping
+from airflow.operators.python import PythonOperator
+from airflow.providers.docker.operators.docker import DockerOperator
+from docker.types import Mount
 
 # Cấu hình đường dẫn dbt project
 # Trong container, dbt được mount tại /opt/airflow/dbt
 DEFAULT_DBT_ROOT_PATH = Path("/opt/airflow/dbt")
 # DBT_ROOT_PATH = Path(os.getenv("DBT_ROOT_PATH", DEFAULT_DBT_ROOT_PATH))
 
-# Cấu hình profile cho PostgreSQL
-# profile_config = ProfileConfig(
-#     profile_name="kai_asia_banking_dbt_project",
-#     target_name="dev",
-#     profile_mapping=PostgresUserPasswordProfileMapping(
-#         conn_id="postgres_kai_asia_banking_project",
-#         profile_args={  
-#             "schema": "staging",
-#             "dbname": "db_banking",
-#         },
-#     ),
-# )
- 
 base_profile_config = ProfileConfig(
     profile_name="kai_asia_banking_dbt_project",
     target_name="dev",
@@ -85,8 +76,8 @@ with DAG(
         ),
         render_config=RenderConfig(
             # Chỉ chạy models trong thư mục staging
-            select=["path:models/staging"],
-            # select=["tag:staging"],
+            # select=["path:models/staging"],
+            select=["tag:staging"],
             enable_mock_profile=False, # Disable mock profile để sử dụng connection thực
             env_vars={  # Biến môi trường nếu cần
                 "DBT_ENV": "staging",       
@@ -115,47 +106,25 @@ with DAG(
     )
     
 
-
-    # snapshot_models = DbtTaskGroup(
-    #     group_id = "snapshot_models",
-    #     project_config = ProjectConfig(
-    #         dbt_project_path = (DBT_ROOT_PATH / "kai_asia_banking_dbt_project" / "kai_asia_banking_dbt_project").as_posix(),
-    #     ),
-    #     render_config = RenderConfig(
-    #         select = ["path:snapshots"],
-    #         enable_mock_profile = False,
-    #         env_vars={  
-    #             "DBT_ENV": "snapshots",       
-    #             "BATCH_DATE": "{{ ds }}",
-    #             "DBT_PROFILES_DIR": "/opt/airflow/dbt/profiles",
-    #             "DBT_PROJECT_DIR": "/opt/airflow/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project",
-    #             "DBT_PARTIAL_PARSE": "false",
-    #             "DBT_STATIC_PARSER": "false",
-    #         },
-    #         airflow_vars_to_purge_dbt_ls_cache=["dbt_snapshots_refresh"],
-    #     ),
-    #     # execution_config=execution_config,
-    #     execution_config = ExecutionConfig(
-    #         invocation_mode=InvocationMode.SUBPROCESS,
-    #         dbt_executable_path="dbt",
-    #     ),
-    #     profile_config=profile_config,
-    #     operator_args={
-    #         "install_deps": True,  # Tự động install dbt dependencies
-    #         "full_refresh": False,  # Không full refresh mặc định
-    #         "debug": True,
-    #         "log_level": "debug",
-    #         "vars": {
-    #             "execution_date": "{{ ds }}",
-    #             "dag_run_id": "{{ dag_run.run_id }}",
-    #         }
-    #     },
-    #     default_args={
-    #         "retries": 1,
-    #         "retry_delay": timedelta(minutes=3),
-    #         "execution_timeout": timedelta(hours=2),  # Timeout sau 2 giờ
-    #     },
-    # )
+    task1 = DockerOperator(
+        task_id = 'snapshot_models_run_by_docker_operator',
+        image = 'ghcr.io/dbt-labs/dbt-postgres:1.9.latest',
+        command = 'snapshot --select snp_branches',
+        working_dir = '/user/app',
+        mounts = [
+            Mount(source='/home/nam11linux/repos/kaiasia_banking_project/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project',
+                target = '/user/app',
+                type = 'bind'
+            ),
+            Mount(source='/home/nam11linux/repos/kaiasia_banking_project/dbt/profiles.yml',
+                target = '/root/.dbt/profiles.yml',
+                type = 'bind'
+            )
+        ],
+        network_mode = 'kaiasia_banking_project_kaiasia-banking-project-network',
+        docker_url = 'unix://var/run/docker.sock',
+        auto_remove = 'success'
+    )
 
 
 
@@ -189,7 +158,7 @@ with DAG(
         task_id="end_point_of_the_pipeline",
         doc_md="End of the data pipeline"
     )
-    start_staging >> staging_models >> end_staging
+    start_staging >> staging_models >> task1 >> end_staging
 
 
 
