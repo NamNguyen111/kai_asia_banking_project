@@ -15,8 +15,7 @@ CREATE TABLE IF NOT EXISTS raw.customers (
     address TEXT, --dia chi khach hang
     date_of_birth DATE, --ngay sinh
     status VARCHAR(10) DEFAULT 'ACTIVE', -- ACTIVE, BLOCKED
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    created_at TIMESTAMP
 );
 
 -- 2. Bảng Tài khoản
@@ -29,7 +28,6 @@ CREATE TABLE IF NOT EXISTS raw.accounts (
     status VARCHAR(10) DEFAULT 'ACTIVE', -- ACTIVE, BLOCKED, CLOSED, trang thai tai khoan
     branch_id VARCHAR(10),
     created_at TIMESTAMP,
-    updated_at TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES raw.customers(customer_id), -- 1 customer_id co the co nhieu accounts
     FOREIGN KEY (branch_id) REFERENCES raw.branches(branch_id)
 );
@@ -43,10 +41,8 @@ CREATE TABLE IF NOT EXISTS raw.transactions (
     amount DECIMAL(15,2) NOT NULL,
     transaction_type VARCHAR(20) DEFAULT 'TRANSFER',
     channel VARCHAR(15) NOT NULL, --MOBILE, ATM, BRANCH
-    -- status VARCHAR(20) DEFAULT 'PENDING', -- PENDING, COMPLETED, FAILED
     description TEXT,
     created_at TIMESTAMP,
-    -- completed_at TIMESTAMP,
     FOREIGN KEY (from_account_id) REFERENCES raw.accounts(account_id),
     FOREIGN KEY (to_account_id) REFERENCES raw.accounts(account_id)
 );

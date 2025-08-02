@@ -7,13 +7,7 @@
         strategy='check',
         check_cols=['balance','status'],
         hard_deletes='ignore',
-        dbt_valid_to_current="'9999-12-31'::date",
-        post_hook="
-            UPDATE {{ this }}
-            SET status = 'DISABLE'
-            WHERE dbt_valid_to != '9999-12-31'::date
-              AND status = 'ACTIVE';
-        "
+        dbt_valid_to_current="'9999-12-31'::date"
     )
 }}
 select * from {{ source('staging','stg_accounts') }}

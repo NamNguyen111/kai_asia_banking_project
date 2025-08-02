@@ -5,24 +5,59 @@ models:
     description: "Staging data for branches"
     columns:
       - name: branch_id
+        description: "Each branch have an unique ID"
+        data_tests:
+          - unique
+          - not_null
       - name: branch_name
+        description: "Name of the branch"
       - name: address
+        description: "Address of the branch"
       - name: status
+        description: "Status of the branch"
+        data_tests:
+          - accepted_values:
+              values: ['ACTIVE', 'CLOSED']
       - name: data_date
+        description: "The day that data is generated"
       - name: created_at
+        description: "The timestamp that data is generated in raw"
       - name: etl_at
+        description: "Timestamp when data is ingested to staging for the first time"
       - name: etl_source_model
+        description: "From which source"
 
   - name: stg_customers
     description: "Staging data for customers"
     columns:
       - name: customer_id
+        description: "Each customer have their unique ID"
+        data_tests:
+          - unique
+          - not_null
       - name: full_name
+        description: "Name of the customer"
+        data_tests:
+          - not_null
       - name: phone_number
+        description: "Customer's phone number"
+        data_tests:
+          - not_null
       - name: email_address
+        description: "Customer's email address"
       - name: identity_number
+        description: "Customer's identity number, very unique"
+        data_tests:
+          - unique
+          - not_null
       - name: address
+        description: "Their address, null which mean homeless :D"
+        data_tests:
+          - not_null
       - name: date_of_birth
+        description: "Customer's date of birth"
+        data_tests:
+          - not_null
       - name: data_date
       - name: created_at
       - name: etl_at
@@ -32,12 +67,44 @@ models:
     description: "Staging data for accounts"
     columns:
       - name: account_id
+        description: "1 Customer can have multiple accounts"
+        data_tests:
+          - unique
+          - not_null
       - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              to : ref('stg_customers')
+              field: customer_id
       - name: account_number
+        description: "The identical number of the account"
+        data_tests:
+          - unique
+          - not_null
       - name: account_type
+        description: "There are 2 types of account"
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['SAVINGS', 'CHECKING', 'CASH']
       - name: balance
+        description: "The balance of the account, can't be negative"
+        data_tests:
+          - not_null
       - name: status
+        description: "Status of the account"
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['ACTIVE', 'DISABLE']
       - name: branch_id
+        description: "The id of the branch where this account was created"
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_branches')
+              field: branch_id
       - name: data_date
       - name: created_at
       - name: etl_at
@@ -47,13 +114,43 @@ models:
     description: "Staging data for transactions"
     columns:
       - name: transaction_id
+        description: "Each transaction have unique ID"
+        data_tests: 
+          - not_null
+          - unique
       - name: reference_number
+        description: "Reference number for this transaction, unique"
+        data_tests:
+          - not_null
+          - unique
       - name: from_account_id
+        description: "From account ID"
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_accounts')
+              field: account_id
       - name: to_account_id
+        description: "To account ID"
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_accounts')
+              field: account_id
       - name: amount
+        description: "Amount of money, can't be negative"
+        data_tests:
+          - not_null
       - name: transaction_type
+        description: "Type of this transaction"
+        accepted_values:
+          values: ['DEBIT', 'CREDIT', 'TRANSFER']
       - name: transaction_channel
+        description: "Channel that have performed the transaction"
+        accepted_values:
+          values: ['ATM', 'MOBILE', 'BRANCH']
       - name: transaction_description
+        description: "Description for this transaction, written by user"
       - name: data_date
       - name: created_at
       - name: etl_at
@@ -63,15 +160,51 @@ models:
     description: "Staging data for transaction entries"
     columns:
       - name: entry_id
+        description: "Each transaction has two corresponding entries to verify its validity"
+        data_tests:
+          - not_null
+          - unique
       - name: transaction_id
+        description: "Refer to the correspond transaction"
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_transactions')
+              field: transaction_id
       - name: account_id
+        description: "ID of the account that made the transaction"
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_accounts')
+              field: account_id
       - name: debit_amount
+        description: "Debit amount"
+        data_tests:
+          - not_null
       - name: credit_amount
+        description: "Credit amount"
+        data_tests:
+          - not_null
       - name: balance_before
+        data_tests:
+          - not_null
       - name: balance_after
+        data_tests:
+          - not_null
       - name: entry_type
+        description: "Entry type, 3 types"
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['DEBIT', 'CREDIT', 'TRANSFER']
       - name: entry_sequence
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['1', '2']
       - name: entry_description
+        description: "Description for this entry"
       - name: data_date
       - name: created_at
       - name: etl_at

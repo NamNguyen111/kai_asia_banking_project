@@ -13,7 +13,6 @@ def random_transaction_type():
     # debit = rút tiền, credit = nạp tiền
     return random.choice(['DEBIT', 'TRANSFER', 'CREDIT'])
 
-
 # Hàm này trả về tuple account tùy trường hợp
 def get_one_or_two_accounts(num, cur):
     if num == 1:
@@ -315,7 +314,7 @@ def insert_new_transaction_record(cur, transaction_data: dict):
         insert_new_transaction_entries(cur = cur, transaction_data=transaction_data)
         
 
-def navigate_func(n=10):
+def navigate_func(n=20):
     with connect_to_db() as conn:
         # Tạo connection
         cur = conn.cursor()
@@ -328,7 +327,7 @@ def navigate_func(n=10):
                     # DEBIT = Rút tiền. Tài khoản gốc bị trừ tiền, tài khoản BANK_CASH được cộng
                     account = get_one_or_two_accounts(1, cur=cur) # Chọn 1 account ngẫu nhiên để thực hiện chuyển tiền
                     from_account, from_balance = account[0] # Lấy ra account_id và balance
-                    amount = Decimal(str(round(random.uniform(1_000, 1_000_000), 2))) #Random 1 số ngẫu nhiên làm amount
+                    amount = Decimal(str(round(random.uniform(1_000, float(from_balance)), 2))) #Random 1 số ngẫu nhiên làm amount
                     from_new_balance = from_balance - amount # Tính luôn new balance sau khi rút tiền
                     updated_at = datetime.now()
                     # Update balance mới cho tài khoản sau khi rút tiền:
@@ -380,7 +379,7 @@ def navigate_func(n=10):
                     accounts = get_one_or_two_accounts(2, cur=cur)
                     from_account, from_balance = accounts[0]
                     to_account, to_balance = accounts[1]
-                    amount = Decimal(str(round(random.uniform(1_000, 1_000_000), 2)))
+                    amount = Decimal(str(round(random.uniform(1_000, float(from_balance)), 2)))
                     from_new_balance = from_balance - amount
                     to_new_balance = to_balance + amount
                     updated_at = datetime.now()

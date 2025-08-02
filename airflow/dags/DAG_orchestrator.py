@@ -106,10 +106,50 @@ with DAG(
     )
     
 
-    task1 = DockerOperator(
-        task_id = 'snapshot_models_run_by_docker_operator',
+    snp_branches = DockerOperator(
+        task_id = 'snapshot_branches_run_by_docker_operator',
         image = 'ghcr.io/dbt-labs/dbt-postgres:1.9.latest',
         command = 'snapshot --select snp_branches',
+        working_dir = '/user/app',
+        mounts = [
+            Mount(source='/home/nam11linux/repos/kaiasia_banking_project/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project',
+                target = '/user/app',
+                type = 'bind'
+            ),
+            Mount(source='/home/nam11linux/repos/kaiasia_banking_project/dbt/profiles.yml',
+                target = '/root/.dbt/profiles.yml',
+                type = 'bind'
+            )
+        ],
+        network_mode = 'kaiasia_banking_project_kaiasia-banking-project-network',
+        docker_url = 'unix://var/run/docker.sock',
+        auto_remove = 'success'
+    )
+
+    snp_customers = DockerOperator(
+        task_id = 'snapshot_customers_run_by_docker_operator',
+        image = 'ghcr.io/dbt-labs/dbt-postgres:1.9.latest',
+        command = 'snapshot --select snp_customers',
+        working_dir = '/user/app',
+        mounts = [
+            Mount(source='/home/nam11linux/repos/kaiasia_banking_project/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project',
+                target = '/user/app',
+                type = 'bind'
+            ),
+            Mount(source='/home/nam11linux/repos/kaiasia_banking_project/dbt/profiles.yml',
+                target = '/root/.dbt/profiles.yml',
+                type = 'bind'
+            )
+        ],
+        network_mode = 'kaiasia_banking_project_kaiasia-banking-project-network',
+        docker_url = 'unix://var/run/docker.sock',
+        auto_remove = 'success'
+    )
+
+    snp_accounts = DockerOperator(
+        task_id = 'snapshot_accounts_run_by_docker_operator',
+        image = 'ghcr.io/dbt-labs/dbt-postgres:1.9.latest',
+        command = 'snapshot --select snp_accounts',
         working_dir = '/user/app',
         mounts = [
             Mount(source='/home/nam11linux/repos/kaiasia_banking_project/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project',
@@ -152,13 +192,12 @@ with DAG(
 
 
 
-
     # Task kết thúc
     end_staging = EmptyOperator(
         task_id="end_point_of_the_pipeline",
         doc_md="End of the data pipeline"
     )
-    start_staging >> staging_models >> task1 >> end_staging
+    start_staging >> staging_models >> [snp_branches, snp_customers, snp_accounts] >> end_staging
 
 
 
