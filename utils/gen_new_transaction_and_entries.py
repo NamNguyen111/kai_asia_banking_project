@@ -4,10 +4,11 @@ import random
 from datetime import datetime
 from faker import Faker
 import psycopg2
-from decimal import Decimal
 fake = Faker()
 
-
+"""
+CODE FILE NÀY RẤT BẨN MẮT
+"""
 
 def random_transaction_type():
     # debit = rút tiền, credit = nạp tiền
@@ -29,7 +30,7 @@ def get_one_or_two_accounts(num, cur):
         # Num == 2: Case là transfer -> lấy ra 2 accounts để thao tác, gọi đến gen_entries để lưu bút toán kép
         cur.execute("""
             SELECT account_id, balance FROM raw.accounts
-            WHERE status = 'ACTIVE'
+            WHERE status = 'ACTIVE' AND account_type = 'CHECKING'
             ORDER BY RANDOM()
             LIMIT 2
         """)
@@ -318,7 +319,7 @@ def navigate_func(n=20):
     with connect_to_db() as conn:
         # Tạo connection
         cur = conn.cursor()
-        # n = số transaction tạo trong 1 lần gọi DAG
+        # n = số transactions tạo trong 1 lần chạy DAG
         for i in range(n):
             # random 1 trong 3 kiểu transaction: TRANSFER, DEBIT, CREDIT
             transaction_type = random_transaction_type()
@@ -327,15 +328,15 @@ def navigate_func(n=20):
                     # DEBIT = Rút tiền. Tài khoản gốc bị trừ tiền, tài khoản BANK_CASH được cộng
                     account = get_one_or_two_accounts(1, cur=cur) # Chọn 1 account ngẫu nhiên để thực hiện chuyển tiền
                     from_account, from_balance = account[0] # Lấy ra account_id và balance
-                    amount = Decimal(str(round(random.uniform(1_000, float(from_balance)), 2))) #Random 1 số ngẫu nhiên làm amount
+                    amount = int(random.uniform(1_000, from_balance)) #Random 1 số ngẫu nhiên làm amount
+                    amount = round(amount, -5)
                     from_new_balance = from_balance - amount # Tính luôn new balance sau khi rút tiền
-                    updated_at = datetime.now()
                     # Update balance mới cho tài khoản sau khi rút tiền:
                     cur.execute("""
                         UPDATE raw.accounts
-                        SET balance = %s, updated_at = %s
+                        SET balance = %s
                         WHERE account_id = %s
-                    """, (from_new_balance, updated_at, from_account))
+                    """, (from_new_balance, from_account))
                     # print(f"account {from_account} từ {from_balance} còn {from_new_balance}")
                     """
                     Với case debit, cần gửi đi mã tài khoản thực hiện rút tiền(from_account), số tiền rút(amount),
@@ -348,7 +349,7 @@ def navigate_func(n=20):
                     transaction_data['transaction_type'] = 'DEBIT'
                     transaction_data['amount'] = amount
                     transaction_data['from_account_balance_before'] = from_balance
-                    transaction_data['channel'] = 'ATM'
+                    transaction_data['channel'] = 'BRANCH'
                     insert_new_transaction_record(cur= cur, transaction_data=transaction_data)
 
 
@@ -356,15 +357,15 @@ def navigate_func(n=20):
                     # print("Truong hop credit: nạp tiền TK")
                     account = get_one_or_two_accounts(1, cur=cur)
                     to_account, to_balance = account[0]
-                    amount = Decimal(str(round(random.uniform(1_000, 1_000_000), 2)))
+                    amount = int(random.uniform(1_000, 10_000_000))
+                    amount = round(amount, -5)
                     to_new_balance = to_balance + amount
-                    updated_at = datetime.now()
                     # Update balance mới cho tài khoản sau khi nạp tiền:
                     cur.execute("""
                         UPDATE raw.accounts
-                        SET balance = %s, updated_at = %s
+                        SET balance = %s
                         WHERE account_id = %s
-                    """, (to_new_balance, updated_at, to_account))
+                    """, (to_new_balance, to_account))
                     # print(f"account {to_account} từ {to_balance} lên {to_new_balance}")
                     transaction_data = {}
                     transaction_data['to_account_id'] = to_account
@@ -379,22 +380,26 @@ def navigate_func(n=20):
                     accounts = get_one_or_two_accounts(2, cur=cur)
                     from_account, from_balance = accounts[0]
                     to_account, to_balance = accounts[1]
-                    amount = Decimal(str(round(random.uniform(1_000, float(from_balance)), 2)))
+                    upper_limit = min(from_balance, 100_000_000)
+                    if upper_limit < 1_000:
+                        amount = int(upper_limit)
+                    else:
+                        amount = int(random.uniform(1_000, upper_limit))
+                    amount = round(amount, -5)
                     from_new_balance = from_balance - amount
                     to_new_balance = to_balance + amount
-                    updated_at = datetime.now()
                     # Update balance for A
                     cur.execute("""
                         UPDATE raw.accounts
-                        SET balance = %s, updated_at = %s
+                        SET balance = %s
                         WHERE account_id = %s
-                    """, (from_new_balance, updated_at, from_account))
+                    """, (from_new_balance, from_account))
                     # Update balance for B
                     cur.execute("""
                         UPDATE raw.accounts
-                        SET balance = %s, updated_at = %s
+                        SET balance = %s
                         WHERE account_id = %s
-                    """, (to_new_balance, updated_at, to_account))
+                    """, (to_new_balance, to_account))
                     # call function to insert transaction
                     transaction_data = {}
                     transaction_data['from_account_id'] = from_account

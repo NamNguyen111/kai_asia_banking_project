@@ -16,3 +16,6 @@ DELETE FROM connection WHERE conn_id = 'connection_name';
 
 -- Kiểm tra lại sau khi xóa
 SELECT COUNT(*) FROM connection;
+
+-- Xem password admind account
+docker exec -it airflow_container-kaiasia-banking-project cat /opt/airflow/simple_auth_manager_passwords.json.generated

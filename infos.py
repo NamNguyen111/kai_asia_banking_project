@@ -13,7 +13,7 @@ Thỏa mãn 1 trong 3 điều kiện sau:
     - Trái phiếu (Bond) và chứng chỉ quỹ(Fund certificate) tại Techcom Securities
 - Tổng tiền gửi mới trong 1 ngày từ 100 triệu, tiền gửi bao gồm:
     - Tiền gửi tiết kiệm (kỳ hạn tối thiểu 3 tháng) --> Là tiền vào tài khoản Savings
-    - Tiền gửi có kỳ hạn (kỳ hạn tối thiểu 3 tháng) --> Là tiền vào Tern Deposit
+    - Tiền gửi có kỳ hạn (kỳ hạn tối thiểu 3 tháng) --> Là tiền vào Term Deposit
     - Chứng chỉ tiền gửi (không bao gồm chứng chỉ tiền gửi trong phần số dư sinh lời tự động) --> Là tiền vào Certificate of Deposit
 - Số lượng giao dịch chủ động trong 30 ngày gần nhất (trên tài khoản thanh toán, thẻ thanh toán và thẻ tín dụng) từ 
 40 giao dịch và SỐ DƯ BÌNH QUÂN CỦA TÀI KHOẢN THANH TOÁN trong 3 tháng gần nhất từ 30 triệu.
@@ -119,5 +119,4 @@ Tiền gửi có kỳ hạn - Term deposit:
 - Kỳ hạn phổ biến: 1 tháng, 3 tháng, 6 tháng, 12 tháng, 24 tháng.
 - Rút tiền trước hạn = chịu mất một phần hoặc toàn bộ lãi.
 - Thanh khoản thấp vì rút = phạt.
-
 """
