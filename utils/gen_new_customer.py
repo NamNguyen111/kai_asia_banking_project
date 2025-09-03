@@ -46,7 +46,7 @@ def insert_mock_customers(n=1, **kwargs):
             date_of_birth = fake.date_of_birth(minimum_age=18, maximum_age=60)
             status = 'ACTIVE'
             customer_segment = 'IRON' # Vừa tạo acc thì auto segment iron
-            customer_since = fake.date_time_between(start_date='-2y', end_date='now')
+            customer_since = fake.date_time_between(start_date='-2y', end_date='-3d')
             # created_at = fake.date_time_between(start_date='-1y', end_date='now')
             created_at = customer_since
             data.append((customer_id, full_name, gender, income_range, occupation, phone, email, id_number, address,

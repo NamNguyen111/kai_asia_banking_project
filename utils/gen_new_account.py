@@ -28,8 +28,14 @@ def get_existing_branch_ids(conn):
 
 def get_customer_since_date(conn, customer_id):
     with conn.cursor() as cur:
-        cur.execute("SELECT customer_since FROM raw.customers WHERE customer_id = %s", (customer_id,))
-        return [row[0] for row in cur.fetchall()]
+        cur.execute("SELECT created_at FROM raw.customers WHERE customer_id = %s", (customer_id,))
+        row = cur.fetchone()
+        return row[0] if row else None
+def get_branch_created_date(conn, branch_id):
+    with conn.cursor() as cur:
+        cur.execute("SELECT created_at FROM raw.branches WHERE branch_id = %s", (branch_id,))
+        row = cur.fetchone()
+        return row[0] if row else None
 
 def insert_mock_accounts(n=1, **kwargs):
     with connect_to_db() as conn:
@@ -41,7 +47,6 @@ def insert_mock_accounts(n=1, **kwargs):
             raise Exception("No customers found in raw.customers")
         if not branch_ids:
             raise Exception("No branches found in raw.branches")
-
         data = []
         for i in range(n):
             numeric_id = next_id + i
@@ -49,8 +54,8 @@ def insert_mock_accounts(n=1, **kwargs):
 
             customer_id = random.choice(customer_ids)
             branch_id = random.choice(branch_ids)
-            account_number = fake.numerify('15##########')  # e.g., 15-digit number
 
+            account_number = fake.numerify('15##########')  # e.g., 15-digit number
             account_type = random.choice(['SAVINGS', 'CHECKING'])
             status = 'ACTIVE'
             # Random sô dư cho tài khoản CHECKING
@@ -83,14 +88,11 @@ def insert_mock_accounts(n=1, **kwargs):
                 tmp_balance = random.randint(low, high)
                 tmp_balance = round(tmp_balance, -5)
                 balance = tmp_balance
+            
             customer_since = get_customer_since_date(conn=conn, customer_id=str(customer_id))
-            customer_since = datetime.combine(customer_since[0], datetime.min.time())
-            # end_date = hiện tại trừ 5 tháng
-            end_date = datetime.now() - relativedelta(months=5)
-
-            created_at = fake.date_time_between(start_date=customer_since, end_date=end_date)
-            # created_at = datetime.now()
-
+            branch_created_date = get_branch_created_date(conn=conn, branch_id=str(branch_id))
+            tmp_date = max(customer_since, branch_created_date)
+            created_at = fake.date_time_between(start_date=tmp_date, end_date='now')
             data.append((
                 account_id, customer_id, account_number, account_type,
                 balance, status, branch_id, created_at

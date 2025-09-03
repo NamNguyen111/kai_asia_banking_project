@@ -17,7 +17,7 @@ def get_next_branch_id(conn):
         return last_num + 1  # next numeric part
 
 
-def insert_mock_branches(n=1):
+def insert_mock_branches(n=5):
     with connect_to_db() as conn:
         next_id = get_next_branch_id(conn)
         data = []
@@ -27,16 +27,9 @@ def insert_mock_branches(n=1):
             branch_name = fake.company()
             address = fake.address().replace('\n', ', ')
             status = 'ACTIVE'
-            # created_at = fake.date_time_between(start_date='-1y', end_date='now')
             now = datetime.now()
-
-            # Mốc 24 tháng trước và 6 tháng trước
-            x_months_ago = now - timedelta(days=24*30)  # xấp xỉ 24 tháng
-            y_month_ago = now - timedelta(days=6*30)     # xấp xỉ 6 tháng
-
-            # Sinh thời gian ngẫu nhiên trong khoảng
-            random_time = x_months_ago + (y_month_ago - x_months_ago) * random.random()
-
+            # Sinh thời gian ngẫu nhiên trong khoảng từ 2 năm trở lại đây
+            random_time = fake.date_time_between(start_date='-2y', end_date='-1m')
             created_at = random_time
             data.append((branch_id, branch_name, address, status, created_at))
         sql = """

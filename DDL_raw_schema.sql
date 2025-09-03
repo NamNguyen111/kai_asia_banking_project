@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS raw.customers (
     customer_id VARCHAR(20) PRIMARY KEY, --ma khach hang
     full_name VARCHAR(100) NOT NULL, --ten khach hang
     gender BIT NOT NULL,  
-    income_range VARCHAR(10),   -- Thu nhập một năm (annual income)
+    income_range BIGINT,   -- Thu nhập một tháng (monthly income)
     occupation VARCHAR(100), -- Nghề nghiệp
     phone VARCHAR(15) NOT NULL, --so dien thoai
     email VARCHAR(100), --email khach hang

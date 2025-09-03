@@ -51,6 +51,7 @@ Diamond:
         - Tài khoản thanh toán
         - Tiền gửi (tiền gửi tiết kiệm, tiền gửi có kỳ hạn, chứng chỉ tiền gửi)
         - Trái phiếu và chứng chỉ quỹ tại Techcom Securities
+        
 Private:
 Thỏa mãn 1 trong 3 điều kiện sau:
 - Tổng tài sản bình quân 3 tháng gần nhất từ 23 tỷ 
@@ -68,12 +69,10 @@ Thỏa mãn 1 trong 3 điều kiện sau:
     - Chứng chỉ tiền gửi (không bao gồm chứng chỉ tiền gửi trong phần số dư sinh lời tự động)
 - Giá trị giao dịch trái phiếu và chứng chỉ quỹ tại Techcom Securities từ 23 tỷ
 
-
 Thông tin về trái phiếu, chứng chỉ quỹ, chứng chỉ tiền gửi, tiền gửi có kỳ hạn
 - Kỳ hạn = chiều dài con đường.
 - Đáo hạn = ngày về đích.
 - Kỳ hạn trả lãi = các trạm dừng nghỉ, nơi bạn nhận “tiền xăng” (lãi) dọc đường.
-
 
 Trái phiếu - Bonds: 
 - Là một loại chứng khoán nợ. Khi bạn mua trái phiếu, tức là bạn cho doanh nghiệp hoặc chính phủ vay tiền.
@@ -111,7 +110,7 @@ Chứng chỉ tiền gửi - Certificate of deposit(CD):
 - Là giấy tờ xác nhận bạn gửi một khoản tiền tại ngân hàng trong một kỳ hạn cố định.
 - Ngân hàng sẽ cam kết trả lãi suất cố định và trả lại gốc khi đáo hạn.
 - Có thể chuyển nhượng cho người khác (tùy ngân hàng), nếu rút trước hạn, bị phạt.
-- Kỳ hạn 1-60 tháng, hoặc dài hơn.
+- Kỳ hạn 6-60 tháng, hoặc dài hơn.
 - Lãi suất fixed, thường cao hơn gửi tiền thông thường.
 
 Tiền gửi có kỳ hạn - Term deposit:

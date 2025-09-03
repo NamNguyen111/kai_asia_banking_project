@@ -19,7 +19,7 @@ def get_one_or_two_accounts(num, cur):
     if num == 1:
         # Num == 1: Case là debit hoặc credit -> Chỉ lấy 1 account ra để thao tác, không gọi đến hàm gen_entries
         cur.execute("""
-            SELECT account_id, balance FROM raw.accounts
+            SELECT account_id, balance, created_at FROM raw.accounts
             WHERE status = 'ACTIVE'
             ORDER BY RANDOM()
             LIMIT 1
@@ -29,7 +29,7 @@ def get_one_or_two_accounts(num, cur):
     else:
         # Num == 2: Case là transfer -> lấy ra 2 accounts để thao tác, gọi đến gen_entries để lưu bút toán kép
         cur.execute("""
-            SELECT account_id, balance FROM raw.accounts
+            SELECT account_id, balance, created_at FROM raw.accounts
             WHERE status = 'ACTIVE' AND account_type = 'CHECKING'
             ORDER BY RANDOM()
             LIMIT 2
@@ -51,7 +51,7 @@ def get_money_from_bank_cash(cur):
 def insert_new_transaction_entries(cur, transaction_data: dict):
     transaction_id = transaction_data['transaction_id']
     transfer_amount = transaction_data['amount']
-    created_at = datetime.now()
+    created_at = transaction_data['created_date_for_entries']
     transaction_type = transaction_data['transaction_type']
     match transaction_type:
         case 'TRANSFER':
@@ -247,13 +247,18 @@ def insert_new_transaction_entries(cur, transaction_data: dict):
             )
     
 
+
 def insert_new_transaction_record(cur, transaction_data: dict):
     transaction_id = str(uuid.uuid4())
     transaction_data['transaction_id'] = transaction_id
     reference_number = fake.bothify(text='REF###############################################')
     description = fake.sentence(nb_words=6)
-    created_at = datetime.now()
     if transaction_data['transaction_type'] == "TRANSFER":
+        from_account_created_date = transaction_data['from_account_created_at']
+        to_account_created_date = transaction_data['to_account_created_at']
+        tmp_date = max(from_account_created_date, to_account_created_date)
+        created_at = fake.date_time_between(start_date=tmp_date, end_date='now')
+        transaction_data['created_date_for_entries'] = created_at
         cur.execute("""
             INSERT INTO raw.transactions (
                 transaction_id, reference_number, from_account_id,
@@ -274,6 +279,9 @@ def insert_new_transaction_record(cur, transaction_data: dict):
         ))
         insert_new_transaction_entries(cur = cur, transaction_data=transaction_data)
     elif transaction_data['transaction_type']== "CREDIT": # Nạp tiền
+        tmp_date = transaction_data['account_created_at']
+        created_at = fake.date_time_between(start_date=tmp_date, end_date='now')
+        transaction_data['created_date_for_entries'] = created_at
         cur.execute("""
             INSERT INTO raw.transactions (
                 transaction_id, reference_number, from_account_id,
@@ -294,6 +302,9 @@ def insert_new_transaction_record(cur, transaction_data: dict):
         ))
         insert_new_transaction_entries(cur = cur, transaction_data=transaction_data)
     else: #Rút tiền (DEBIT)
+        tmp_date = transaction_data['account_created_at']
+        created_at = fake.date_time_between(start_date=tmp_date, end_date='now')
+        transaction_data['created_date_for_entries'] = created_at
         cur.execute("""
             INSERT INTO raw.transactions (
                 transaction_id, reference_number, from_account_id,
@@ -327,7 +338,9 @@ def navigate_func(n=20):
                 case 'DEBIT':
                     # DEBIT = Rút tiền. Tài khoản gốc bị trừ tiền, tài khoản BANK_CASH được cộng
                     account = get_one_or_two_accounts(1, cur=cur) # Chọn 1 account ngẫu nhiên để thực hiện chuyển tiền
-                    from_account, from_balance = account[0] # Lấy ra account_id và balance
+                    if not account:  # Nếu None hoặc rỗng
+                        continue  # bỏ qua vòng lặp này
+                    from_account, from_balance, account_created_at = account[0] # Lấy ra account_id và balance
                     amount = int(random.uniform(1_000, from_balance)) #Random 1 số ngẫu nhiên làm amount
                     amount = round(amount, -5)
                     from_new_balance = from_balance - amount # Tính luôn new balance sau khi rút tiền
@@ -345,6 +358,7 @@ def navigate_func(n=20):
                     balance trước khi thực hiện transaction để làm bảng entries (from_balance)
                     """
                     transaction_data = {}
+                    transaction_data['account_created_at'] = account_created_at
                     transaction_data['from_account_id'] = from_account
                     transaction_data['transaction_type'] = 'DEBIT'
                     transaction_data['amount'] = amount
@@ -356,7 +370,9 @@ def navigate_func(n=20):
                 case 'CREDIT':
                     # print("Truong hop credit: nạp tiền TK")
                     account = get_one_or_two_accounts(1, cur=cur)
-                    to_account, to_balance = account[0]
+                    if not account: 
+                        continue 
+                    to_account, to_balance, account_created_at = account[0]
                     amount = int(random.uniform(1_000, 10_000_000))
                     amount = round(amount, -5)
                     to_new_balance = to_balance + amount
@@ -368,6 +384,7 @@ def navigate_func(n=20):
                     """, (to_new_balance, to_account))
                     # print(f"account {to_account} từ {to_balance} lên {to_new_balance}")
                     transaction_data = {}
+                    transaction_data['account_created_at'] = account_created_at
                     transaction_data['to_account_id'] = to_account
                     transaction_data['transaction_type'] = 'CREDIT'
                     transaction_data['amount'] = amount
@@ -378,8 +395,10 @@ def navigate_func(n=20):
                 case 'TRANSFER':
                     # print("Chuyen tien")
                     accounts = get_one_or_two_accounts(2, cur=cur)
-                    from_account, from_balance = accounts[0]
-                    to_account, to_balance = accounts[1]
+                    if not accounts or len(accounts) < 2:
+                        continue  # bỏ qua vòng lặp này
+                    from_account, from_balance, from_account_created_at = accounts[0]
+                    to_account, to_balance, to_account_created_at = accounts[1]
                     upper_limit = min(from_balance, 100_000_000)
                     if upper_limit < 1_000:
                         amount = int(upper_limit)
@@ -402,6 +421,8 @@ def navigate_func(n=20):
                     """, (to_new_balance, to_account))
                     # call function to insert transaction
                     transaction_data = {}
+                    transaction_data['from_account_created_at'] = from_account_created_at
+                    transaction_data['to_account_created_at'] = to_account_created_at
                     transaction_data['from_account_id'] = from_account
                     transaction_data['to_account_id'] = to_account
                     transaction_data['transaction_type'] = 'TRANSFER'
