@@ -127,7 +127,8 @@ def insert_mock_loans(n=1, **kwargs):
                     term_length=term_length,
                     start_date=start_date,
                     repayment_method=repayment_method,
-                    penalty_rate=penalty_rate
+                    penalty_rate=penalty_rate,
+                    maturity_date=maturity_date
                 )
 
         conn.commit()
@@ -246,7 +247,7 @@ def random_workhour_datetime(d: date) -> datetime:
 
 
 
-def insert_mock_loan_repayments(cur, loan_id, loan_amount, interest_rate, term_length, start_date, repayment_method, penalty_rate):
+def insert_mock_loan_repayments(cur, loan_id, loan_amount, interest_rate, term_length, start_date, repayment_method, penalty_rate, maturity_date):
     tmp_date = start_date
     today = datetime.today()
     if repayment_method == "EMI":
@@ -256,7 +257,7 @@ def insert_mock_loan_repayments(cur, loan_id, loan_amount, interest_rate, term_l
         emi = EMI_calculator(loan_amount=loan_amount, interest_rate=interest_rate, term_length=term_length)
         tmp_loan_amount = loan_amount
         r = (interest_rate / 100) / 12  # lãi suất theo tháng
-        while tmp_date + relativedelta(months=1) < today:
+        while tmp_date + relativedelta(months=1) <= min(today, maturity_date):
             # Tính due_date cho record hiện tại
             due_date = tmp_date + relativedelta(months=1)
             # Tính phần lãi phải trả trong kì này 
@@ -323,7 +324,7 @@ def insert_mock_loan_repayments(cur, loan_id, loan_amount, interest_rate, term_l
                         interest_paid_t,
                         penalty_number, # Phạt trả chậm
                         outstanding_principal_t,
-                        "ON_TIME",
+                        "LATE",
                         random.choice(["CASH", "TRANSFER"]),
                         random_workhour_datetime(due_date)    
                     )
@@ -335,6 +336,14 @@ def insert_mock_loan_repayments(cur, loan_id, loan_amount, interest_rate, term_l
                         WHERE loan_id = %s
                     """, (outstanding_principal_t, loan_id))
             tmp_date = tmp_date + relativedelta(months=1)
+            print(tmp_loan_amount)
+        if tmp_loan_amount < 1:
+            cur.execute("""
+                        UPDATE raw.loans
+                        SET status = %s
+                        WHERE loan_id = %s
+                    """, ("CLOSED", loan_id))
+        # print("/////////////////////////")
     elif repayment_method == "INTEREST_ONLY":
         """
         Interest_Only là chỉ trả 1 phần lãi, gốc trả cuối kì + 1 phần lãi cuối
@@ -401,9 +410,17 @@ def insert_mock_loan_repayments(cur, loan_id, loan_amount, interest_rate, term_l
                         monthly_interest_pay_amount,
                         penalty_number, # Phạt trả chậm
                         loan_amount,
-                        "ON_TIME",
+                        "LATE",
                         random.choice(["CASH", "TRANSFER"]),
                         random_workhour_datetime(due_date)    
                     )
                 )
             tmp_date = tmp_date + relativedelta(months=1)
+        # print("/////////////////////////")
+        if tmp_loan_amount < 1:
+            cur.execute("""
+                        UPDATE raw.loans
+                        SET status = %s
+                        WHERE loan_id = %s
+                    """, ("CLOSED", loan_id))
+    

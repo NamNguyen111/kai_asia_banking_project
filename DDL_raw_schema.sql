@@ -21,7 +21,6 @@ CREATE TABLE IF NOT EXISTS raw.bonds (
     maturity_date DATE NOT NULL -- Ngày đáo hạn
 );
 
-
 -- 3. Bảng Khách hàng
 CREATE TABLE IF NOT EXISTS raw.customers (
     customer_id VARCHAR(20) PRIMARY KEY, --ma khach hang
@@ -98,7 +97,6 @@ CREATE TABLE IF NOT EXISTS raw.bond_holdings (
     FOREIGN KEY (bond_code) REFERENCES raw.bonds(bond_code)
 );
 
-
 -- 8. Bảng chứng chỉ quỹ
 CREATE TABLE IF NOT EXISTS raw.fund_certificate_holdings (
     fund_cert_holding_id UUID PRIMARY KEY, -- ID
@@ -109,10 +107,8 @@ CREATE TABLE IF NOT EXISTS raw.fund_certificate_holdings (
     purchase_date DATE NOT NULL,           -- Ngày mua 
     status VARCHAR(10) DEFAULT 'ACTIVE',   -- ACTIVE, REDEEMED, EXPIRED
     created_at TIMESTAMP DEFAULT NOW(),
-
     FOREIGN KEY (customer_id) REFERENCES raw.customers(customer_id)
 );
-
 
 -- 9. Bảng tiền gửi có kỳ hạn
 CREATE TABLE IF NOT EXISTS raw.term_deposit_holdings (
@@ -126,10 +122,8 @@ CREATE TABLE IF NOT EXISTS raw.term_deposit_holdings (
     interest_calculation_method VARCHAR(15) NOT NULL DEFAULT 'SIMPLE',
     status VARCHAR(10) DEFAULT 'ACTIVE',    -- ACTIVE, CLOSED, MATURED
     created_at TIMESTAMP DEFAULT NOW(),
-
     FOREIGN KEY (customer_id) REFERENCES raw.customers(customer_id)
 );
-
 
 -- 10. Bảng chứng chỉ tiền gửi
 CREATE TABLE IF NOT EXISTS raw.certificate_of_deposit_holdings (
@@ -143,7 +137,6 @@ CREATE TABLE IF NOT EXISTS raw.certificate_of_deposit_holdings (
     interest_calculation_method VARCHAR(15) NOT NULL DEFAULT 'SIMPLE',
     status VARCHAR(50) DEFAULT 'ACTIVE',    -- ACTIVE, REDEEMED, MATURED
     created_at TIMESTAMP DEFAULT NOW(),
-
     FOREIGN KEY (customer_id) REFERENCES raw.customers(customer_id)
 );
 
@@ -160,10 +153,9 @@ CREATE TABLE IF NOT EXISTS raw.loans (
     repayment_method VARCHAR(20),           -- EMI, INTEREST_ONLY
     penalty_rate NUMERIC(5,2),              -- % phạt trả chậm
     collateral VARCHAR(255),                -- Tài sản thế chấp
-    status VARCHAR(50) DEFAULT 'ONGOING',   -- ONGOING, OVERDUE, CLOSED, DEFAULTED
-     remaining_balance BIGINT NOT NULL,   -- Dư nợ gốc còn lại
+    status VARCHAR(50) DEFAULT 'ONGOING',   -- ONGOING, CLOSED, DEFAULTED
+    remaining_balance BIGINT NOT NULL,   -- Dư nợ gốc còn lại
     created_at TIMESTAMP DEFAULT NOW(),
-
     FOREIGN KEY (customer_id) REFERENCES raw.customers(customer_id)
 );
 
@@ -180,6 +172,5 @@ CREATE TABLE IF NOT EXISTS raw.loan_repayments (
     status VARCHAR(50) DEFAULT 'ON_TIME',     -- ON_TIME, LATE
     payment_method VARCHAR(50),                 -- Chuyển khoản, Tiền mặt...
     created_at TIMESTAMP DEFAULT NOW(),
-
     FOREIGN KEY (loan_id) REFERENCES raw.loans(loan_id)
 );

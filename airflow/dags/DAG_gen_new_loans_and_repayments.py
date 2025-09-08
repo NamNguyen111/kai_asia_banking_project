@@ -22,6 +22,6 @@ with dag:
     task1 = PythonOperator(
         task_id='insert_loans',
         python_callable=insert_mock_loans,
-        op_kwargs={'n': 10}
+        op_kwargs={'n': 1}
     )
     task1
