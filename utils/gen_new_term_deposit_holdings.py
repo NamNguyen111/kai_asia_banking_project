@@ -40,22 +40,13 @@ def insert_mock_term_deposit_holdings(n=1, **kwargs):
             interest_rate = round(random.uniform(5.0, 10.0), 2)
             interest_payment_interval = random.choice([3, 6, 12])
 
-            # Tính start_date, sẽ trong khoảng customer_since tới cách đây 6 tháng
             customer_since = get_customer_since_date(customer_id=str(customer_id), conn=conn)   
-            customer_since = datetime.combine(customer_since[0], datetime.min.time()) 
-            end_date = datetime.now() - relativedelta(months=6)
-            start_date = fake.date_time_between(start_date=customer_since, end_date=end_date)
-
-
-
+            start_date = fake.date_time_between(start_date=customer_since, end_date='now')
             years_to_add = random.choice([1, 2, 3])  # Random số năm đáo hạn
             maturity_date = start_date + relativedelta(years=years_to_add)
-
             interest_calculation_method = random.choice(["SIMPLE", "COMPOUND"])
-            term_length = years_to_add * 12
             status = "ACTIVE"
             created_at = start_date
-
             data.append((
                 customer_id, principal, interest_rate, interest_payment_interval,
                 start_date, maturity_date, interest_calculation_method, status, created_at

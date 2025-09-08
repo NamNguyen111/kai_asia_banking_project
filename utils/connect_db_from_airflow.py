@@ -29,3 +29,9 @@ def connect_to_db_local(): # --> CÁI NÀY CHO KẾT NỐI TỪ LOCAL
     except psycopg2.Error as e:
         print(f"Database connection failed: {e}")
         raise
+
+def get_customer_since_date(conn, customer_id):
+    with conn.cursor() as cur:
+        cur.execute("SELECT created_at FROM raw.customers WHERE customer_id = %s", (customer_id,))
+        row = cur.fetchone()
+        return row[0] if row else None

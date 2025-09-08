@@ -35,9 +35,7 @@ def insert_mock_cert_of_deposit_holdings(n=1, **kwargs):
             interest_rate = random.uniform(6.0, 8.0)
             # Tính start_date, sẽ trong khoảng customer_since tới cách đây 6 tháng
             customer_since = get_customer_since_date(customer_id=str(customer_id), conn=conn)   
-            customer_since = datetime.combine(customer_since[0], datetime.min.time()) 
-            tmp_date = datetime.now() - relativedelta(months=1)
-            start_date = fake.date_time_between(start_date=customer_since, end_date=tmp_date)
+            start_date = fake.date_time_between(start_date=customer_since, end_date='now')
             years_to_add = random.choice([1, 2, 3, 4, 5])  # Random số năm đáo hạn
             maturity_date = start_date + relativedelta(years=years_to_add)
             interest_calculation_method = random.choice(["SIMPLE", "COMPOUND"])

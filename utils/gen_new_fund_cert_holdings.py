@@ -26,11 +26,8 @@ def insert_mock_fund_cert_holdings(n=1, **kwargs):
             # Random số lượng chứng chỉ quỹ
             units = random.uniform(1000, 10000)
             nav_price = round(random.uniform(10000, 14000),-3)
-            # Tính start_date, sẽ trong khoảng customer_since tới cách đây 6 tháng
             customer_since = get_customer_since_date(customer_id=str(customer_id), conn=conn)   
-            customer_since = datetime.combine(customer_since[0], datetime.min.time()) 
-            tmp_date = datetime.now() - relativedelta(months=1)
-            purchase_date = fake.date_time_between(start_date=customer_since, end_date=tmp_date)
+            purchase_date = fake.date_time_between(start_date=customer_since, end_date='now')
             status = "ACTIVE"
             created_at = purchase_date
             data.append((

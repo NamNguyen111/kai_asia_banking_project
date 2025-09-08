@@ -124,7 +124,6 @@ CREATE TABLE IF NOT EXISTS raw.term_deposit_holdings (
     start_date DATE NOT NULL,       -- Ngày bắt đầu gửi tiền
     maturity_date DATE NOT NULL,            -- Ngày đáo hạn
     interest_calculation_method VARCHAR(15) NOT NULL DEFAULT 'SIMPLE',
-    -- term_length INT NOT NULL, -- Kỳ hạn (tính theo tháng)
     status VARCHAR(10) DEFAULT 'ACTIVE',    -- ACTIVE, CLOSED, MATURED
     created_at TIMESTAMP DEFAULT NOW(),
 
@@ -150,7 +149,7 @@ CREATE TABLE IF NOT EXISTS raw.certificate_of_deposit_holdings (
 
 -- 11. Bảng Khoản vay
 CREATE TABLE IF NOT EXISTS raw.loans (
-    loan_id SERIAL PRIMARY KEY,
+    loan_id UUID PRIMARY KEY,
     customer_id VARCHAR(20) NOT NULL,
     loan_type VARCHAR(50),                  -- Tín chấp, Thế chấp, Thấu chi...
     loan_amount BIGINT NOT NULL,     -- Số tiền vay (theo hợp đồng)
@@ -158,10 +157,11 @@ CREATE TABLE IF NOT EXISTS raw.loans (
     term_length INT NOT NULL,               -- Kỳ hạn (tháng)
     start_date DATE NOT NULL,               -- Ngày giải ngân
     maturity_date DATE NOT NULL,            -- Ngày đáo hạn
-    repayment_method VARCHAR(20),           -- EMI, INTEREST_ONLY, BULLET
+    repayment_method VARCHAR(20),           -- EMI, INTEREST_ONLY
     penalty_rate NUMERIC(5,2),              -- % phạt trả chậm
     collateral VARCHAR(255),                -- Tài sản thế chấp
     status VARCHAR(50) DEFAULT 'ONGOING',   -- ONGOING, OVERDUE, CLOSED, DEFAULTED
+     remaining_balance BIGINT NOT NULL,   -- Dư nợ gốc còn lại
     created_at TIMESTAMP DEFAULT NOW(),
 
     FOREIGN KEY (customer_id) REFERENCES raw.customers(customer_id)
@@ -170,14 +170,14 @@ CREATE TABLE IF NOT EXISTS raw.loans (
 -- 12. Bảng Lịch sử trả nợ
 CREATE TABLE IF NOT EXISTS raw.loan_repayments (
     repayment_id SERIAL PRIMARY KEY,
-    loan_id INT NOT NULL,
+    loan_id UUID NOT NULL,
     due_date DATE NOT NULL,                     -- Ngày đến hạn trả
     repayment_date DATE,                         -- Ngày thực tế trả
     principal_paid BIGINT DEFAULT 0,     -- Trả gốc
     interest_paid BIGINT DEFAULT 0,      -- Trả lãi
     late_fee_paid BIGINT DEFAULT 0,      -- Trả phí phạt chậm
     remaining_balance BIGINT NOT NULL,   -- Dư nợ gốc còn lại
-    status VARCHAR(50) DEFAULT 'SCHEDULED',     -- SCHEDULED, ON_TIME, LATE, PARTIAL
+    status VARCHAR(50) DEFAULT 'ON_TIME',     -- ON_TIME, LATE
     payment_method VARCHAR(50),                 -- Chuyển khoản, Tiền mặt...
     created_at TIMESTAMP DEFAULT NOW(),
 

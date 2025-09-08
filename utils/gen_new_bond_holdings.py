@@ -41,11 +41,7 @@ def insert_mock_bond_holdings(n=1, **kwargs):
             buy_quantity = random.uniform(10, 100)
             status = "ACTIVE"
             customer_since = get_customer_since_date(conn=conn, customer_id=str(customer_id))
-            customer_since = datetime.combine(customer_since[0], datetime.min.time())
-            # end_date = hiện tại trừ 5 tháng
-            end_date = datetime.now() - relativedelta(months=6)
-
-            created_at = fake.date_time_between(start_date=customer_since, end_date=end_date)
+            created_at = fake.date_time_between(start_date=customer_since, end_date='now')
 
             data.append((
                 bond_transaction_id, bond_code, customer_id, buy_quantity, status, created_at
