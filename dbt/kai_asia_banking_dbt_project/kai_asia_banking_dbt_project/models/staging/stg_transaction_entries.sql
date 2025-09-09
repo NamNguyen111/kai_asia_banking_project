@@ -1,51 +1,51 @@
 {{
     config(
-        materialized = 'incremental',
-        schema = 'staging',
-        unique_key = 'entry_id',
-        on_schema_change = 'fail'
+        materialized='incremental',
+        unique_key='entry_id',
+        on_schema_change='fail',
+        schema=var("custom_schema", "staging")
     )
 }}
 
-WITH source_data as (
-    SELECT entry_id,
-            transaction_id,
-            account_id,
-            debit_amount,
-            credit_amount,
-            balance_before,
-            balance_after,
-            entry_type,
-            entry_sequence,
-            description,
-            created_at
+WITH source_data AS (
+
+    SELECT
+        entry_id,
+        transaction_id,
+        account_id,
+        debit_amount,
+        credit_amount,
+        balance_before,
+        balance_after,
+        entry_type,
+        entry_sequence,
+        description,
+        created_at
     FROM {{ source('raw', 'transaction_entries') }}
+
+    {% if is_incremental() %}
+        -- chỉ lấy các entry_id chưa tồn tại trong staging
+        WHERE entry_id NOT IN (SELECT entry_id FROM {{ this }})
+    {% endif %}
 ),
 
 cleaned AS (
-    SELECT entry_id,
-            transaction_id,
-            account_id,
-            CAST(debit_amount as NUMERIC) AS debit_amount,
-            CAST(credit_amount as NUMERIC) AS credit_amount,
-            CAST(balance_before as NUMERIC) AS balance_before,
-            CAST(balance_after as NUMERIC) AS balance_after,
-            TRIM(UPPER(entry_type)) AS entry_type,
-            entry_sequence,
-            TRIM(description) AS entry_description,
-            DATE(created_at) AS data_date,
-            created_at,
-            CURRENT_TIMESTAMP AS etl_at,
-            'raw_transaction_entries' AS etl_source_model
 
+    SELECT
+        entry_id,                                -- UUID, giữ nguyên
+        transaction_id,                          -- UUID, giữ nguyên
+        UPPER(TRIM(account_id))       AS account_id,
+        CAST(debit_amount AS NUMERIC) AS debit_amount,
+        CAST(credit_amount AS NUMERIC)AS credit_amount,
+        CAST(balance_before AS NUMERIC)AS balance_before,
+        CAST(balance_after AS NUMERIC) AS balance_after,
+        UPPER(TRIM(entry_type))       AS entry_type,        -- chuẩn hóa DEBIT / CREDIT
+        CAST(entry_sequence AS INT)   AS entry_sequence,
+        TRIM(description)             AS description,
+        CAST(created_at AS TIMESTAMP) AS created_at,
+        CURRENT_TIMESTAMP             AS etl_at,
+        'raw.transaction_entries'     AS etl_source_model
     FROM source_data
-
-    {% if is_incremental() %}
-        WHERE created_at > (SELECT MAX(created_at) FROM {{ this }})
-        AND entry_id is NOT NULL
-    {% else %}
-        WHERE entry_id is NOT NULL
-    {% endif %}
 )
 
-SELECT * from cleaned
+SELECT * FROM cleaned

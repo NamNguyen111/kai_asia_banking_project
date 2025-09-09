@@ -15,3 +15,10 @@ sources:
       - name: transactions   
       - name: accounts      
       - name: transaction_entries    
+      - name: loans
+      - name: loan_repayments
+      - name: bonds
+      - name: bond_holdings
+      - name: certificate_of_deposit_holdings
+      - name: fund_certificate_holdings
+      - name: term_deposit_holdings

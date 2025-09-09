@@ -1,47 +1,47 @@
 {{
     config(
-        materialized = 'incremental',
-        schema = 'staging',
-        unique_key = 'transaction_id',
-        on_schema_change = 'fail'
+        materialized='incremental',
+        unique_key='transaction_id',
+        on_schema_change='fail',
+        schema=var("custom_schema", "staging")
     )
 }}
 
-WITH source_data as (
-    SELECT transaction_id,
-            reference_number,
-            from_account_id,
-            to_account_id,
-            amount,
-            transaction_type,
-            channel,
-            description,
-            created_at
+WITH source_data AS (
+
+    SELECT
+        transaction_id,
+        reference_number,
+        from_account_id,
+        to_account_id,
+        amount,
+        transaction_type,
+        channel,
+        description,
+        created_at
     FROM {{ source('raw', 'transactions') }}
+
+    {% if is_incremental() %}
+        -- chỉ lấy những transaction_id chưa tồn tại trong bảng staging
+        WHERE transaction_id NOT IN (SELECT transaction_id FROM {{ this }})
+    {% endif %}
 ),
 
 cleaned AS (
-    SELECT transaction_id,
-            TRIM(reference_number) as reference_number,
-            from_account_id,
-            to_account_id,
-            CAST(amount AS NUMERIC) AS amount,
-            UPPER(TRIM(transaction_type)) as transaction_type,
-            UPPER(TRIM(channel)) as transaction_channel,
-            TRIM(description) as transaction_description,
-            DATE(created_at) as data_date,
-            created_at,
-            CURRENT_TIMESTAMP as etl_at,
-            'raw_transactions' as etl_source_model
 
+    SELECT
+        transaction_id,                           -- giữ nguyên UUID
+        TRIM(reference_number)          AS reference_number,
+        UPPER(TRIM(from_account_id))    AS from_account_id,
+        UPPER(TRIM(to_account_id))      AS to_account_id,
+        CAST(amount AS NUMERIC)         AS amount,
+        UPPER(TRIM(transaction_type))   AS transaction_type,
+        UPPER(TRIM(channel))            AS channel,
+        TRIM(description)               AS description,
+        CAST(created_at AS TIMESTAMP)   AS created_at,
+        CURRENT_TIMESTAMP               AS etl_at,
+        'raw.transactions'              AS etl_source_model
     FROM source_data
-
-    {% if is_incremental() %}
-        WHERE created_at > (SELECT MAX(created_at) FROM {{ this }})
-        AND transaction_id is NOT NULL
-    {% else %}
-        WHERE transaction_id is NOT NULL
-    {% endif %}
 )
 
-SELECT * from cleaned
+SELECT * FROM cleaned

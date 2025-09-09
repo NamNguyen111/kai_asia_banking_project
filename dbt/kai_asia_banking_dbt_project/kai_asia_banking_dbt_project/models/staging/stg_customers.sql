@@ -1,51 +1,53 @@
-{{
+{{ 
     config(
-        materialized='incremental',
-        schema = 'staging',
+        materialized='view',
         unique_key='customer_id',
-        on_schema_change='fail',
-    )
+        on_schema_change = 'fail',
+        schema=var("custom_schema", "staging")
+    ) 
 }}
 
-WITH source_data as (
-    SELECT  
+WITH source_data AS (
+
+    SELECT
         customer_id,
         full_name,
+        gender,
+        income_range,
+        occupation,
         phone,
         email,
         id_number,
         address,
         date_of_birth,
+        status,
+        customer_segment,
+        customer_since,
         created_at
-    FROM {{ source('raw','customers') }}
+    FROM {{ source('raw', 'customers') }}
+
 ),
 
 cleaned AS (
+
     SELECT
-        customer_id,
-
-        TRIM(full_name) as full_name,
-        phone as phone_number,
-        TRIM(email) as email_address,
-        TRIM(id_number) as identity_number,
-        TRIM(address) as address,
-        date_of_birth as date_of_birth,
-        DATE(created_at) as data_date,
-
-        created_at,
-
-        CURRENT_TIMESTAMP as etl_at,
-        'raw_customers' as etl_source_model
-    
+        UPPER(TRIM(customer_id))       AS customer_id,         
+        INITCAP(TRIM(full_name))       AS full_name,
+        gender,                                                
+        CAST(income_range AS NUMERIC)  AS income_range,
+        TRIM(occupation)               AS occupation,
+        TRIM(phone)                    AS phone,
+        LOWER(TRIM(email))             AS email,
+        UPPER(TRIM(id_number))         AS id_number,
+        TRIM(address)                  AS address,
+        CAST(date_of_birth AS DATE)    AS date_of_birth,
+        UPPER(TRIM(status))            AS status,
+        UPPER(TRIM(customer_segment))  AS customer_segment,
+        CAST(customer_since AS DATE)   AS customer_since,
+        CAST(created_at AS TIMESTAMP)  AS created_at,
+        CURRENT_TIMESTAMP              AS etl_at,
+        'raw.customers'                AS etl_source_model
     FROM source_data
-
-    {% if is_incremental() %}
-        WHERE created_at > (SELECT MAX(created_at) FROM {{this}})
-        AND customer_id is NOT NULL
-    {% else %}
-        WHERE customer_id is not NULL
-    {% endif %}
 )
 
-SELECT * from cleaned
-
+SELECT * FROM cleaned

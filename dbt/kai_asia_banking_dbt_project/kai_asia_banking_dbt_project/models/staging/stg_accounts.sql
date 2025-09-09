@@ -1,45 +1,41 @@
-{{
+{{ 
     config(
-        materialized = 'incremental',
-        unique_key = 'account_id',
-        on_schema_change = 'fail',
+        materialized='view',
+        unique_key='account_id',
+        on_schema_change='fail',
         schema=var("custom_schema", "staging")
-    )
+    ) 
 }}
 
-WITH source_data as (
-    SELECT account_id,
-            customer_id,
-            account_number,
-            account_type,
-            balance,
-            status,
-            branch_id,
-            created_at
+WITH source_data AS (
+
+    SELECT
+        account_id,
+        customer_id,
+        account_number,
+        account_type,
+        balance,
+        status,
+        branch_id,
+        created_at
     FROM {{ source('raw', 'accounts') }}
+
 ),
 
 cleaned AS (
-    SELECT account_id,
-            customer_id,
-            TRIM(account_number) as account_number,
-            UPPER(TRIM(account_type)) as account_type,
-            CAST(balance AS NUMERIC) AS balance,
-            UPPER(TRIM(status)) as status,
-            branch_id,
-            DATE(created_at) as data_date,
-            created_at,
-            CURRENT_TIMESTAMP as etl_at,
-            'raw_accounts' as etl_source_model
 
+    SELECT
+        UPPER(TRIM(account_id))          AS account_id,       
+        UPPER(TRIM(customer_id))         AS customer_id,      -- FK -> customers
+        TRIM(account_number)             AS account_number,
+        UPPER(TRIM(account_type))        AS account_type,     -- chuẩn hóa SAVINGS / CHECKING
+        CAST(balance AS NUMERIC)         AS balance,
+        UPPER(TRIM(status))              AS status,
+        UPPER(TRIM(branch_id))           AS branch_id,        -- FK -> branches
+        CAST(created_at AS TIMESTAMP)    AS created_at,
+        CURRENT_TIMESTAMP                AS etl_at,
+        'raw.accounts'                   AS etl_source_model
     FROM source_data
-
-    {% if is_incremental() %}
-        WHERE created_at > (SELECT MAX(created_at) FROM {{ this }})
-        AND account_id is NOT NULL
-    {% else %}
-        WHERE account_id is NOT NULL
-    {% endif %}
 )
 
-SELECT * from cleaned
+SELECT * FROM cleaned

@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS raw.accounts (
     status VARCHAR(10) DEFAULT 'ACTIVE', -- ACTIVE, BLOCKED, CLOSED, trang thai tai khoan
     branch_id VARCHAR(10),
     created_at TIMESTAMP,
+
     FOREIGN KEY (customer_id) REFERENCES raw.customers(customer_id), -- 1 customer_id co the co nhieu accounts
     FOREIGN KEY (branch_id) REFERENCES raw.branches(branch_id)
 );
@@ -64,6 +65,7 @@ CREATE TABLE IF NOT EXISTS raw.transactions (
     channel VARCHAR(10) NOT NULL, --MOBILE, ATM, BRANCH
     description TEXT,
     created_at TIMESTAMP,
+
     FOREIGN KEY (from_account_id) REFERENCES raw.accounts(account_id),
     FOREIGN KEY (to_account_id) REFERENCES raw.accounts(account_id)
 );
@@ -81,6 +83,7 @@ CREATE TABLE IF NOT EXISTS raw.transaction_entries (
     entry_sequence INT NOT NULL,              -- Thứ tự bút toán (1, 2, 3...) Trong project này làm sequence 1,2 thôi
     description TEXT,
     created_at TIMESTAMP,
+
     FOREIGN KEY (transaction_id) REFERENCES raw.transactions(transaction_id),
     FOREIGN KEY (account_id) REFERENCES raw.accounts(account_id)
 );
@@ -93,6 +96,7 @@ CREATE TABLE IF NOT EXISTS raw.bond_holdings (
     buy_quantity INT NOT NULL,  -- Số lượng trái phiếu đã mua
     status VARCHAR(50) DEFAULT 'ACTIVE',   -- ACTIVE, MATURED, REDEEMED
     created_at TIMESTAMP DEFAULT NOW(),
+
     FOREIGN KEY (customer_id) REFERENCES raw.customers(customer_id),
     FOREIGN KEY (bond_code) REFERENCES raw.bonds(bond_code)
 );
@@ -107,6 +111,7 @@ CREATE TABLE IF NOT EXISTS raw.fund_certificate_holdings (
     purchase_date DATE NOT NULL,           -- Ngày mua 
     status VARCHAR(10) DEFAULT 'ACTIVE',   -- ACTIVE, REDEEMED, EXPIRED
     created_at TIMESTAMP DEFAULT NOW(),
+
     FOREIGN KEY (customer_id) REFERENCES raw.customers(customer_id)
 );
 
@@ -122,6 +127,7 @@ CREATE TABLE IF NOT EXISTS raw.term_deposit_holdings (
     interest_calculation_method VARCHAR(15) NOT NULL DEFAULT 'SIMPLE',
     status VARCHAR(10) DEFAULT 'ACTIVE',    -- ACTIVE, CLOSED, MATURED
     created_at TIMESTAMP DEFAULT NOW(),
+
     FOREIGN KEY (customer_id) REFERENCES raw.customers(customer_id)
 );
 
@@ -137,6 +143,7 @@ CREATE TABLE IF NOT EXISTS raw.certificate_of_deposit_holdings (
     interest_calculation_method VARCHAR(15) NOT NULL DEFAULT 'SIMPLE',
     status VARCHAR(50) DEFAULT 'ACTIVE',    -- ACTIVE, REDEEMED, MATURED
     created_at TIMESTAMP DEFAULT NOW(),
+    
     FOREIGN KEY (customer_id) REFERENCES raw.customers(customer_id)
 );
 
@@ -156,6 +163,7 @@ CREATE TABLE IF NOT EXISTS raw.loans (
     status VARCHAR(50) DEFAULT 'ONGOING',   -- ONGOING, CLOSED, DEFAULTED
     remaining_balance BIGINT NOT NULL,   -- Dư nợ gốc còn lại
     created_at TIMESTAMP DEFAULT NOW(),
+
     FOREIGN KEY (customer_id) REFERENCES raw.customers(customer_id)
 );
 
@@ -172,5 +180,6 @@ CREATE TABLE IF NOT EXISTS raw.loan_repayments (
     status VARCHAR(50) DEFAULT 'ON_TIME',     -- ON_TIME, LATE
     payment_method VARCHAR(50),                 -- Chuyển khoản, Tiền mặt...
     created_at TIMESTAMP DEFAULT NOW(),
+
     FOREIGN KEY (loan_id) REFERENCES raw.loans(loan_id)
 );

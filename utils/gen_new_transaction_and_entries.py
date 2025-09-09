@@ -20,7 +20,7 @@ def get_one_or_two_accounts(num, cur):
         # Num == 1: Case là debit hoặc credit -> Chỉ lấy 1 account ra để thao tác, không gọi đến hàm gen_entries
         cur.execute("""
             SELECT account_id, balance, created_at FROM raw.accounts
-            WHERE status = 'ACTIVE'
+            WHERE status = 'ACTIVE' AND account_id != 'BANK_CASH'
             ORDER BY RANDOM()
             LIMIT 1
         """)
@@ -30,7 +30,7 @@ def get_one_or_two_accounts(num, cur):
         # Num == 2: Case là transfer -> lấy ra 2 accounts để thao tác, gọi đến gen_entries để lưu bút toán kép
         cur.execute("""
             SELECT account_id, balance, created_at FROM raw.accounts
-            WHERE status = 'ACTIVE' AND account_type = 'CHECKING'
+            WHERE status = 'ACTIVE' AND account_type = 'CHECKING' AND account_id != 'BANK_CASH'
             ORDER BY RANDOM()
             LIMIT 2
         """)
