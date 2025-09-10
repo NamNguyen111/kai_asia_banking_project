@@ -43,9 +43,10 @@ cleaned AS (
         UPPER(TRIM(status))                AS status,         -- ON_TIME, LATE
         UPPER(TRIM(payment_method))        AS payment_method, -- CHUYỂN KHOẢN, TIỀN MẶT...
         CAST(created_at AS TIMESTAMP)      AS created_at,
+        DATE(created_at)                   AS data_date,
         CURRENT_TIMESTAMP                  AS etl_at,
         'raw.loan_repayments'              AS etl_source_model
     FROM source_data
 )
 
-SELECT * FROM cleaned;
+SELECT * FROM cleaned

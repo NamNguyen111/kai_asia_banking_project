@@ -33,6 +33,7 @@ cleaned AS (
         UPPER(TRIM(status))              AS status,
         UPPER(TRIM(branch_id))           AS branch_id,        -- FK -> branches
         CAST(created_at AS TIMESTAMP)    AS created_at,
+        DATE(created_at)                 AS data_date,
         CURRENT_TIMESTAMP                AS etl_at,
         'raw.accounts'                   AS etl_source_model
     FROM source_data

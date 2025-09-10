@@ -27,6 +27,7 @@ cleaned AS (
         TRIM(address)              AS address,
         UPPER(TRIM(status))        AS status,
         CAST(created_at AS TIMESTAMP) AS created_at,
+        DATE(created_at)               AS data_date,
         CURRENT_TIMESTAMP          AS etl_at,
         'raw.branches'             AS etl_source_model
     FROM source_data

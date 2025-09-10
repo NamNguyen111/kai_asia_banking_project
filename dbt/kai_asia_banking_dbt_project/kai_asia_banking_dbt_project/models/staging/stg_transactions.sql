@@ -36,9 +36,10 @@ cleaned AS (
         UPPER(TRIM(to_account_id))      AS to_account_id,
         CAST(amount AS NUMERIC)         AS amount,
         UPPER(TRIM(transaction_type))   AS transaction_type,
-        UPPER(TRIM(channel))            AS channel,
-        TRIM(description)               AS description,
+        UPPER(TRIM(channel))            AS transaction_channel,
+        TRIM(description)               AS transaction_description,
         CAST(created_at AS TIMESTAMP)   AS created_at,
+        DATE(created_at)                AS data_date,
         CURRENT_TIMESTAMP               AS etl_at,
         'raw.transactions'              AS etl_source_model
     FROM source_data

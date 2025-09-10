@@ -41,6 +41,7 @@ cleaned AS (
         UPPER(TRIM(interest_calculation_method)) AS interest_calculation_method, -- SIMPLE, COMPOUND
         UPPER(TRIM(status))              AS status,        -- ACTIVE, CLOSED, MATURED
         CAST(created_at AS TIMESTAMP)    AS created_at,
+        DATE(created_at)                 AS data_date,
         CURRENT_TIMESTAMP                AS etl_at,
         'raw.term_deposit_holdings'      AS etl_source_model
     FROM source_data

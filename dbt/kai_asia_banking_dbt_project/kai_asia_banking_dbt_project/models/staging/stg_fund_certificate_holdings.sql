@@ -37,6 +37,7 @@ cleaned AS (
         CAST(purchase_date AS DATE)     AS purchase_date,
         UPPER(TRIM(status))             AS status,        -- normalize ACTIVE / REDEEMED / EXPIRED
         CAST(created_at AS TIMESTAMP)   AS created_at,
+        DATE(created_at)                AS data_date,
         CURRENT_TIMESTAMP               AS etl_at,
         'raw.fund_certificate_holdings' AS etl_source_model
     FROM source_data

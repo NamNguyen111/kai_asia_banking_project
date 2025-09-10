@@ -28,11 +28,12 @@ cleaned AS (
 
     SELECT
         bond_transaction_id,                          -- UUID giữ nguyên
-        UPPER(TRIM(bond_code))        AS bond_code,
+        UPPER(TRIM(bond_code))        AS bond_id,
         UPPER(TRIM(customer_id))      AS customer_id,
         CAST(buy_quantity AS INT)     AS buy_quantity,
         UPPER(TRIM(status))           AS status,         -- normalize ACTIVE, MATURED, REDEEMED
         CAST(created_at AS TIMESTAMP) AS created_at,
+        DATE(created_at)              AS data_date,
         CURRENT_TIMESTAMP             AS etl_at,
         'raw.bond_holdings'           AS etl_source_model
     FROM source_data

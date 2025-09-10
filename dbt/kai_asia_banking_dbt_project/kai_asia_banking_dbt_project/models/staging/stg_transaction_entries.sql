@@ -41,8 +41,9 @@ cleaned AS (
         CAST(balance_after AS NUMERIC) AS balance_after,
         UPPER(TRIM(entry_type))       AS entry_type,        -- chuẩn hóa DEBIT / CREDIT
         CAST(entry_sequence AS INT)   AS entry_sequence,
-        TRIM(description)             AS description,
+        TRIM(description)             AS entry_description,
         CAST(created_at AS TIMESTAMP) AS created_at,
+        DATE(created_at)              AS data_date,
         CURRENT_TIMESTAMP             AS etl_at,
         'raw.transaction_entries'     AS etl_source_model
     FROM source_data

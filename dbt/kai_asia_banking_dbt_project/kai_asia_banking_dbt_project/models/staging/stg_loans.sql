@@ -45,9 +45,10 @@ cleaned AS (
         UPPER(TRIM(status))               AS status,               -- ONGOING, CLOSED, DEFAULTED
         CAST(remaining_balance AS NUMERIC) AS remaining_balance,
         CAST(created_at AS TIMESTAMP)     AS created_at,
+        DATE(created_at)                  AS data_date,
         CURRENT_TIMESTAMP                 AS etl_at,
         'raw.loans'                       AS etl_source_model
     FROM source_data
 )
 
-SELECT * FROM cleaned;
+SELECT * FROM cleaned

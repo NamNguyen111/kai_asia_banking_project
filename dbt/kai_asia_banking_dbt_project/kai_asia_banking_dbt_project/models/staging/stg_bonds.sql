@@ -18,7 +18,7 @@ WITH source_data as (
         cast(face_value as numeric)       as face_value,
         cast(interest_rate as numeric(5,2)) as interest_rate,
         issue_date,
-        maturity_date,
+        maturity_date
     FROM {{ source('raw', 'bonds') }}
 
 ),
