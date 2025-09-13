@@ -47,7 +47,7 @@ INSERT INTO raw.accounts (
     'CASH',
     999999999900000000.99,
     'ACTIVE',
-    NULL,
+    'BR00000001',
     NOW()
 );
 

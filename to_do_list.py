@@ -1,5 +1,3 @@
-# Chỉ khai báo sources.yml cho các bảng trong db/external, còn các bảng mà dbt tạo ra thì dùng ref() 
-
 """
 Segmentation rules:
 Bank có 6 segments:

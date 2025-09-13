@@ -33,11 +33,11 @@ models:
   kai_asia_banking_dbt_project:
     # Config indicated by + and applies to all files under models/example/
     staging:
-      +materialized: incremental
       +tags: ["staging"]
+      +schema: staging
 
 snapshots:
   kai_asia_banking_dbt_project:
-    +target_schema: snapshots        # Schema để lưu snapshots
-    +tags: ["snapshots"]
-    # +check_cols: 'all'              # Check tất cả columns cho changes
+    # +target_schema: snapshots        # Schema để lưu snapshots
+    # +tags: ["snapshots"]
+    +schema: snapshot

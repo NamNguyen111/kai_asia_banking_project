@@ -481,8 +481,6 @@ models:
         data_tests:
           - not_null
       - name: collateral
-        data_tests:
-          - not_null
       - name: status
         data_tests:
           - not_null

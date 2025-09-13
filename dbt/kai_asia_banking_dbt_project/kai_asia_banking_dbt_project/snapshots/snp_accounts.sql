@@ -10,5 +10,5 @@
         dbt_valid_to_current="'9999-12-31'::date"
     )
 }}
-select * from {{ source('staging','stg_accounts') }}
+select * from {{ ref('stg_accounts') }}
 {% endsnapshot %}

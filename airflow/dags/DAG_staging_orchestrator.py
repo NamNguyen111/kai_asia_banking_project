@@ -8,11 +8,13 @@ from pathlib import Path
 from airflow import DAG
 from airflow.operators.empty import EmptyOperator
 from cosmos import DbtTaskGroup, ExecutionConfig, ProfileConfig, ProjectConfig, RenderConfig
+from cosmos.operators.local import DbtSnapshotLocalOperator, DbtRunLocalOperator
 from cosmos.constants import InvocationMode
 from cosmos.profiles import PostgresUserPasswordProfileMapping
 from airflow.operators.python import PythonOperator
 from airflow.providers.docker.operators.docker import DockerOperator
 from docker.types import Mount
+
 
 # Cấu hình đường dẫn dbt project
 # Trong container, dbt được mount tại /opt/airflow/dbt
@@ -38,7 +40,7 @@ execution_config = ExecutionConfig(
 
 # Default arguments cho DAG
 default_args = {
-    'owner': 'nam_11',
+    'owner': 'nam_check1',
     'depends_on_past': False,
     'start_date': datetime(2024, 1, 1),
     'email_on_failure': False,
@@ -49,10 +51,11 @@ default_args = {
 }
 
 with DAG(
-    dag_id="dbt_all_models_kai_asia_banking",
+    dag_id="dbt_staging_models_kai_asia_banking",
     default_args=default_args,
     description="Run all dbt models for Kai Asia Banking Project",
-    schedule="@daily",  # Chạy hàng ngày lúc 00:00 UTC
+    # schedule="@daily",  # Chạy hàng ngày lúc 00:00 UTC
+    schedule = "0 18 * * *",  # 18h UTC = 1h sáng VN, chạy trước snapshot 1 tiếng
     start_date=datetime(2024, 1, 1),
     catchup=False,
     tags=["dbt", "orchestrator", "kai_asia_banking"],
@@ -104,100 +107,13 @@ with DAG(
             "execution_timeout": timedelta(hours=2),  # Timeout sau 2 giờ
         },
     )
-    
-
-    snp_branches = DockerOperator(
-        task_id = 'snapshot_branches_run_by_docker_operator',
-        image = 'ghcr.io/dbt-labs/dbt-postgres:1.9.latest',
-        command = 'snapshot --select snp_branches',
-        working_dir = '/user/app',
-        mounts = [
-            Mount(source='/home/nam11linux/repos/kaiasia_banking_project/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project',
-                target = '/user/app',
-                type = 'bind'
-            ),
-            Mount(source='/home/nam11linux/repos/kaiasia_banking_project/dbt/profiles.yml',
-                target = '/root/.dbt/profiles.yml',
-                type = 'bind'
-            )
-        ],
-        network_mode = 'kaiasia_banking_project_kaiasia-banking-project-network',
-        docker_url = 'unix://var/run/docker.sock',
-        auto_remove = 'success'
-    )
-
-    snp_customers = DockerOperator(
-        task_id = 'snapshot_customers_run_by_docker_operator',
-        image = 'ghcr.io/dbt-labs/dbt-postgres:1.9.latest',
-        command = 'snapshot --select snp_customers',
-        working_dir = '/user/app',
-        mounts = [
-            Mount(source='/home/nam11linux/repos/kaiasia_banking_project/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project',
-                target = '/user/app',
-                type = 'bind'
-            ),
-            Mount(source='/home/nam11linux/repos/kaiasia_banking_project/dbt/profiles.yml',
-                target = '/root/.dbt/profiles.yml',
-                type = 'bind'
-            )
-        ],
-        network_mode = 'kaiasia_banking_project_kaiasia-banking-project-network',
-        docker_url = 'unix://var/run/docker.sock',
-        auto_remove = 'success'
-    )
-
-    snp_accounts = DockerOperator(
-        task_id = 'snapshot_accounts_run_by_docker_operator',
-        image = 'ghcr.io/dbt-labs/dbt-postgres:1.9.latest',
-        command = 'snapshot --select snp_accounts',
-        working_dir = '/user/app',
-        mounts = [
-            Mount(source='/home/nam11linux/repos/kaiasia_banking_project/dbt/kai_asia_banking_dbt_project/kai_asia_banking_dbt_project',
-                target = '/user/app',
-                type = 'bind'
-            ),
-            Mount(source='/home/nam11linux/repos/kaiasia_banking_project/dbt/profiles.yml',
-                target = '/root/.dbt/profiles.yml',
-                type = 'bind'
-            )
-        ],
-        network_mode = 'kaiasia_banking_project_kaiasia-banking-project-network',
-        docker_url = 'unix://var/run/docker.sock',
-        auto_remove = 'success'
-    )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     # Task kết thúc
     end_staging = EmptyOperator(
         task_id="end_point_of_the_pipeline",
         doc_md="End of the data pipeline"
     )
-    start_staging >> staging_models >> [snp_branches, snp_customers, snp_accounts] >> end_staging
+    start_staging >> staging_models >> end_staging
 
 
 
