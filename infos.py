@@ -7,8 +7,8 @@ Bank có 6 segments:
 Iron: Người dùng bình thường
 Silver: 
 Thỏa mãn 1 trong 3 điều kiện sau:
-- Tổng tài sản bình quân 3 tháng gần nhất từ 100tr đến 200tr, tính bao gồm:
-    - Tài khoản thanh toán (Checking account)
+- Tổng tài sản bình quân(trung bình cộng) 3 tháng gần nhất từ 100tr đến 200tr, tính bao gồm:
+    - Tài khoản thanh toán (Checking account) OK
     - Tiền gửi (tiền gửi tiết kiệm (Saving account), tiền gửi có kì hạn (Term Deposit), chứng chỉ tiền gửi(Certificate of Deposit))
     - Trái phiếu (Bond) và chứng chỉ quỹ(Fund certificate) tại Techcom Securities
 - Tổng tiền gửi mới trong 1 ngày từ 100 triệu, tiền gửi bao gồm:

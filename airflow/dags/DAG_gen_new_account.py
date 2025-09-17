@@ -22,6 +22,6 @@ with dag:
     task1 = PythonOperator(
         task_id='insert_account',
         python_callable=insert_mock_accounts,
-        op_kwargs={'n': 10}
+        op_kwargs={'n': 100}
     )
     task1

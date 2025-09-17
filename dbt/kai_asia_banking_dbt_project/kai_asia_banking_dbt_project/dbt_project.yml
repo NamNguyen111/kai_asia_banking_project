@@ -36,6 +36,9 @@ models:
       +tags: ["staging"]
       +schema: staging
 
+    intermediate:
+      +tags: ["intermediate"]
+      +schema: intermediate
 snapshots:
   kai_asia_banking_dbt_project:
     # +target_schema: snapshots        # Schema để lưu snapshots

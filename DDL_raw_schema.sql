@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS raw.branches (
     status VARCHAR(10) DEFAULT 'ACTIVE',
     created_at TIMESTAMP
 );
-
 -- 2. Bảng Trái phiếu
 CREATE TABLE IF NOT EXISTS raw.bonds (
     bond_code VARCHAR(10) PRIMARY KEY, -- Mã trái phiếu

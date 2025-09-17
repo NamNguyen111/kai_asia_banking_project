@@ -18,6 +18,7 @@ default_args = {
 dag = DAG(
     dag_id='insert_new_transaction_and_entries',
     default_args=default_args,
+    max_active_runs=1,
     schedule=timedelta(minutes=5)
 )
 
